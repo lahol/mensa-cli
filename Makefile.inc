@@ -1,0 +1,10 @@
+CC       = gcc
+AR       = ar
+ARFLAGS  = 
+RANLIB   = ranlib
+INCS     = 
+LIBS     = -lc
+PRJFLAGS = -Wall $(INCS) -ggdb
+RM       = rm
+LD       = ld
+MAKE     = make

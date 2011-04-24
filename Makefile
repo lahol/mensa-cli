@@ -1,13 +1,15 @@
-CC = gcc
-AR = ar
-ARFLAGS =
-RANLIB = ranlib
-CFLAGS = -Wall
+include Makefile.inc
+
+DIRS = libmensa
+OBJS = main.o defaults.o commands.o
+OBJLIBS = libmensa.a
+CFLAGS = $(PRJFLAGS) -I. -I./libmensa 
+LDFLAGS = -L./libmensa
 
 all: mensa libmensa.a
 
-mensa: main.o defaults.o commands.o libmensa.a
-	$(CC) $(CFLAGS) -o mensa main.o defaults.o commands.o -L . -lmensa
+mensa: $(OBJS) $(OBJLIBS)
+	$(CC) $(LDFLAGS) -o mensa $(OBJS) $(LIBS) -lmensa
 
 main.o: main.c defaults.h commands.h
 	$(CC) $(CFLAGS) -c -o main.o main.c
@@ -20,14 +22,12 @@ commands.o: commands.c commands.h defaults.h
 	
 #libmensa.so: mensa.o
 #	$(CC) $(CFLAGS) -shared -o libmensa.so mensa.o
-libmensa.a: mensa.o
-	$(AR) $(ARFLAGS) rv libmensa.a mensa.o
-	$(RANLIB) libmensa.a
-
-mensa.o: mensa.c mensa.h
-#	$(CC) $(CFLAGS) -c -fpic -o mensa.o mensa.c
-	$(CC) $(CFLAGS) -c -o mensa.o mensa.c
-
+libmensa.a: force_look
+	cd libmensa; $(MAKE) $(MFLAGS)
 
 clean:
-	rm -f *.o mensa libmensa.so libmensa.a
+	rm -f *.o mensa
+	for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
+
+force_look:
+	true

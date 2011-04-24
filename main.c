@@ -29,7 +29,19 @@ int cmd_help(int argc, char **argv) {
 }
 
 int cmd_info(int argc, char **argv) {
-  printf("Info\n");
+  char buffer[512];
+  mensaSchema * schema = NULL;
+
+  schema = mensa_schema_read_from_file(NULL);
+  if (mensa_schema_get_path(schema, 2, 0, buffer) == 0) {
+    printf("path: %s\n", buffer);
+  }
+  else {
+    fprintf(stderr, "could not read path\n");
+  }
+
+  mensa_schema_free(schema);
+
   return 0;
 }
 

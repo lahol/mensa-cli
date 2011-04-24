@@ -1,6 +1,8 @@
 #ifndef __MENSA_H__
 #define __MENSA_H__
 
+#include "mensaschema.h"
+
 typedef struct _MensaMeal {
   char *description;
 } MensaMeal;
