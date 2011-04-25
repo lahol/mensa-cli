@@ -29,36 +29,34 @@ int cmd_help(int argc, char **argv) {
 }
 
 int cmd_info(int argc, char **argv) {
-  char buffer[512];
-  mensaSchema * schema = NULL;
-
-  schema = mensa_schema_read_from_file(NULL);
-  if (mensa_schema_get_path(schema, 2, 0, buffer) == 0) {
-    printf("path: %s\n", buffer);
-  }
-  else {
-    fprintf(stderr, "could not read path\n");
-  }
-
-  mensa_schema_free(schema);
-
+  printf("Info\n");
   return 0;
 }
 
 int cmd_show(int argc, char **argv) {
+  mensaSchema *schema = NULL;
+  int i;
+
   printf("Show\n");
-  MensaMealGroup *group = mensa_get_meals(0, 0, 0);
+  
+  schema = mensa_schema_read_from_file(NULL);
+  if (!schema) {
+    fprintf(stderr, "Error reading schema.\n");
+    return 1;
+  }
+  MensaMealGroup *group = mensa_get_meals(schema, 0, 0, 0);
   if (!group) {
     fprintf(stderr, "Error reading meals.\n");
+    mensa_schema_free(schema);
     return 1;
   }
   
-  int i;
   for (i = 0; i < group->meal_count; i++) {
     printf("Meal %d: %s\n", i+1, group->meals[i].description);
   }
   
   mensa_free_meals(group);
+  mensa_schema_free(schema);
   return 0;
 }
 

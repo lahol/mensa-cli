@@ -1,22 +1,14 @@
 #include "mensa.h"
+#include "mensa-schema.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
 
-MensaMealGroup* mensa_get_meals(int day, int mon, int year) {
-  MensaMealGroup *group = malloc(sizeof(MensaMealGroup));
-  if (!group) return NULL;
-  group->meals = malloc(sizeof(MensaMeal));
-  group->meal_count = 1;
-  if (!group->meals) {
-    free(group);
-    return NULL;
-  }
-  memset(group->meals, 0, sizeof(MensaMeal)*group->meal_count);
-  group->meals[0].description = strdup("Meal description");
-  
-  return group;
+MensaMealGroup* mensa_get_meals(mensaSchema *schema, int day, int mon, int year) {
+  if (!schema) return NULL;
+  /*TODO: insert calculations for week and day */
+  return mensa_schema_get_foods(schema, 0, 2);
 }
 
 void mensa_free_meals(MensaMealGroup *meals) {

@@ -3,7 +3,7 @@ include ../Makefile.inc
 CFLAGS = $(PRJCFLAGS) `xml2-config --cflags`
 OBJLIBS = libmensa.a
 
-OBJS = mensa.o mensaschema.o
+OBJS = mensa.o mensa-schema.o mensa-helpers.o
 
 all: $(OBJLIBS)
 
@@ -11,11 +11,14 @@ libmensa.a: $(OBJS)
 	$(AR) $(ARFLAGS) rv libmensa.a $(OBJS)
 	$(RANLIB) libmensa.a
 
-mensa.o: mensa.c mensa.h mensaschema.h
+mensa.o: mensa.c mensa.h mensa-schema.h mensa-data.h
 	$(CC) $(CFLAGS) -c -o mensa.o mensa.c
 	
-mensaschema.o: mensaschema.c mensaschema.h
-	$(CC) $(CFLAGS) -c -o mensaschema.o mensaschema.c
+mensa-schema.o: mensa-schema.c mensa-schema.h mensa-data.h
+	$(CC) $(CFLAGS) -c -o mensa-schema.o mensa-schema.c
+
+mensa-helpers.o: mensa-helpers.c mensa-helpers.h
+	$(CC) $(CFLAGS) -c -o mensa-helpers.o mensa-helpers.c
 	
 clean: 
 	$(RM) -f *.o libmensa.a
