@@ -51,8 +51,13 @@ int cmd_show(int argc, char **argv) {
     return 1;
   }
   
-  for (i = 0; i < group->meal_count; i++) {
-    printf("Meal %d: %s\n", i+1, group->meals[i].description);
+  if (group->meal_count > 0) {
+    for (i = 0; i < group->meal_count; i++) {
+      printf("Meal %d: %s\n", i+1, group->meals[i].description);
+    }
+  }
+  else {
+    printf("No data available.\n");
   }
   
   mensa_free_meals(group);

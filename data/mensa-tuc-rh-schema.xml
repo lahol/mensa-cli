@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<schema>
+  <name>tu-chemnitz.de-rh</name>
+  <source id="1" format="html"
+  flags="0">/home/lahol/Projekte/mensa/sources/web_RH.html</source>
+  <fooddescription identifier="Hauptessen 1">Essen 1</fooddescription>
+  <fooddescription identifier="Hauptessen 2">Essen 2</fooddescription>
+  <fooddescription identifier="Hauptessen 3">Essen 3</fooddescription>
+  <fooddescription identifier="Hauptessen 4">Essen 4</fooddescription>
+  <fooddescription identifier="Abendessen 1">Abendessen 1</fooddescription>
+  <fooddescription identifier="Abendessen 2">Abendessen 2</fooddescription>
+  <fooddescription identifier="Abendessen 3">Abendessen 3</fooddescription>
+  <fooddescription identifier="Abendessen 4">Abendessen 4</fooddescription>
+  <fooddescription identifier="Gemüsebar">Gemüsebar</fooddescription>
+  <fooddescription
+  identifier="Vegetarieressen">Vegetarieressen</fooddescription>
+  <food source="1" week="0" day="1"
+  path="/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[2]/td[1]/table/tbody/tr[2]/td"
+  description="../../tr[1]/td" />
+  <food source="1" week="0" day="1"
+  path="/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[3]/td[1]/table/tbody/tr[2]/td"
+  description="../../tr[1]/td" />
+  <food source="1" week="0" day="1"
+  path="/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[4]/td[1]/table/tbody/tr[2]/td"
+  description="../../tr[1]/td" />
+  <food source="1" week="0" day="1"
+  path="/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[5]/td[1]/table/tbody/tr[2]/td"
+  description="../../tr[1]/td" />
+  <food source="1" week="0" day="1"
+  path="/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[6]/td[1]/table/tbody/tr[2]/td"
+  description="../../tr[1]/td" />
+</schema>
