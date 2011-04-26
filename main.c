@@ -3,10 +3,14 @@
 #include <getopt.h>
 #include <ctype.h>
 #include <string.h>
+#include <locale.h>
+#include <libintl.h>
 #include "commands.h"
 #include "defaults.h"
 #include "mensa.h"
 #include "mensa-output.h"
+#define _XOPEN_SOURCE
+#include <time.h>
 
 int parse_cmdline(int argc, char **argv);
 
@@ -42,9 +46,19 @@ int cmd_show(int argc, char **argv) {
   int day = 1;
   int flag;
   char type_string[256];
+  char header[256];
+  char format_header[512];
   int type_str_len = 16;
+  mensaDate date;
+  struct tm show_tm;
+  time_t timestamp;
+  /*i = 2;*/
+   /*try every command for time */
+/*  while (!arg_time && i < argc) {
+    arg_time = cmd_parse_time(argv[i]);
+  }*/
 
-  printf("Show\n");
+  defaults_get("show.header", header);
   
   schema = mensa_schema_read_from_file("/home/lahol/Projekte/mensa/data/mensa-tuc-rh-schema.xml");
   if (!schema) {
@@ -52,7 +66,12 @@ int cmd_show(int argc, char **argv) {
     return 1;
   }
   
-  if (argc >= 3) {
+/*  mensa_translate_date(26, 4, 2011, &day, NULL);
+  mensa_translate_date(1, 5, 2011, &day, NULL);
+  mensa_translate_date(2, 5, 2011, &day, NULL);
+  mensa_translate_date(27, 4, 2011, &day, NULL);*/
+  
+/*  if (argc >= 3) {
     i = 0;
     flag = 1;
     while (argv[2][i] != '\0') {
@@ -64,15 +83,35 @@ int cmd_show(int argc, char **argv) {
     if (flag) {
       day = atoi(argv[2]);
     }
-  }
+  }*/
   
-  MensaMealGroup *group = mensa_get_meals(schema, day, 0, 0);
+  if (argc >= 3) {
+    mensa_parse_time(argv[2], &date);
+  }
+  else {
+    mensa_parse_time(NULL, &date);
+  }
+  mensa_translate_date(&date);
+  
+  MensaMealGroup *group = mensa_get_meals(schema, &date);
   if (!group) {
     fprintf(stderr, "Error reading meals.\n");
     mensa_schema_free(schema);
     return 1;
   }
   
+  if (header[0] != '\0') {
+    show_tm.tm_mday = date.day;
+    show_tm.tm_mon = date.month-1;
+    show_tm.tm_year = date.year-1900;
+    show_tm.tm_hour = show_tm.tm_min = show_tm.tm_sec = 0;
+    timestamp = mktime(&show_tm);
+    memcpy(&show_tm, localtime(&timestamp), sizeof(struct tm));
+    if (strftime(format_header, 512, header, &show_tm)) {
+      mensa_output_block(stdout, format_header, 80, 0, 1);
+    }
+  }
+
   if (group->meal_count > 0) {
     for (i = 0; i < group->meal_count; i++) {
       if (group->meals[i].type) {
@@ -103,10 +142,13 @@ int cmd_config(int argc, char **argv) {
 
 int main(int argc, char **argv) {
 /*  parse_cmdline(argc, argv);*/
+  setlocale(LC_ALL, "");
+
   defaults_add("cmd.default", "show");
   defaults_add("show.date", "today");
   defaults_add("show.mensa", "rh");
   defaults_add("show.clear-cache", "no");
+  defaults_add("show.header", "Offers for %A, %x");
   command_add("help", cmd_help, NULL);
   command_add("info", cmd_info, NULL);
   command_add("show", cmd_show, NULL);

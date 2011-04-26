@@ -3,8 +3,9 @@
 
 #include "mensa-data.h"
 #include "mensa-schema.h"
+#include "mensa-time.h"
 
-MensaMealGroup* mensa_get_meals(mensaSchema *schema, int day, int mon, int year);
+MensaMealGroup* mensa_get_meals(mensaSchema *schema, mensaDate *date);
 void mensa_free_meals(MensaMealGroup *meals);
 
 #endif

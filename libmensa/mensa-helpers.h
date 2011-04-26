@@ -10,4 +10,6 @@ struct _mensaList {
 mensaList *mensa_list_prepend(mensaList *list, void *data);
 mensaList *mensa_list_reverse(mensaList *list);
 
+void mensa_string_beautify(char *str, int inner);
+
 #endif

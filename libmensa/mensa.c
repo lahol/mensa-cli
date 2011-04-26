@@ -5,10 +5,11 @@
 #include <memory.h>
 #include <string.h>
 
-MensaMealGroup* mensa_get_meals(mensaSchema *schema, int day, int mon, int year) {
+MensaMealGroup* mensa_get_meals(mensaSchema *schema, mensaDate *date) {
   if (!schema) return NULL;
+  if (!date) return NULL;
   /*TODO: insert calculations for week and day */
-  return mensa_schema_get_foods(schema, 0, day);
+  return mensa_schema_get_foods(schema, date->week, date->dow);
 }
 
 void mensa_free_meals(MensaMealGroup *meals) {
