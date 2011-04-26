@@ -3,6 +3,8 @@
 
 typedef struct _MensaMeal {
   char *description;
+  char *type;
+  int order;
 } MensaMeal;
 
 typedef struct _MensaMealGroup {

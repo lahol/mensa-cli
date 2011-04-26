@@ -308,9 +308,11 @@ MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, int week, int day) 
   char path[BUFFER_SIZE];
   MensaMealGroup *group = NULL;
   int count = 0;
-  int i, j;
+  int i, j, k;
+  int dindex;
   mensaList *list = NULL;
-  mensaList *tmp;
+  mensaList *desc_list = NULL;
+  mensaList *tmp, *tmpdesc;
   struct _mensaSchemaSourceFood *food;
   struct _mensaSchemaSource *source;
   char *data;
@@ -340,6 +342,23 @@ MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, int week, int day) 
         if (data) {
           list = mensa_list_prepend(list, (void*)data);
           count++;
+          strcpy(path, schema->foods[i].path);
+          strcat(path, "/");
+          strcat(path, schema->foods[i].desc_path);
+/*          fprintf(stderr, "desc-path: %s\n", path);*/
+          data = _mensa_schema_get_data(cur_doc, path);
+          dindex = -1;
+          if (data) {
+/*            fprintf(stderr, "try to find \"%s\" in %d descs\n", data, schema->nfdescs);*/
+            for (k = 0; k < schema->nfdescs; k++) {
+/*              fprintf(stderr, "  %d: %s\n", k, schema->fdescs[k].identifier);*/
+              if (!strcmp(data, schema->fdescs[k].identifier)) {
+                dindex = k;
+                break;
+              }
+            }
+          }
+          desc_list = mensa_list_prepend(desc_list, ((void*)((long)dindex)));
         }
       }
     }
@@ -361,12 +380,26 @@ MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, int week, int day) 
   }
   
   tmp = NULL;
+  tmpdesc= NULL;
   for (i = count-1; i >= 0; i--) {
     if (list) {
       group->meals[i].description = (char*)list->data;
       tmp = list->next;
       free(list);
       list = tmp;
+      if (desc_list) {
+        if (((int)((long)desc_list->data)) >= 0 && 
+            ((int)((long)desc_list->data)) < schema->nfdescs) {
+          group->meals[i].type = 
+            strdup(schema->fdescs[((int)((long)desc_list->data))].description);
+        }
+        else {
+          group->meals[i].type = NULL;
+        }
+        tmpdesc = desc_list->next;
+        free(desc_list);
+        desc_list = tmpdesc;
+      }
     }
   }
   
@@ -425,6 +458,7 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
   xmlChar *content;
   int len = 0, l = 0;
   if (!doc || !path) {
+    fprintf(stderr, "!doc || !path");
     return NULL;
   }
   
@@ -439,6 +473,7 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
   /* get nodeset data for xpathObj->nodesetval */
   size = (xpathObj->nodesetval) ? xpathObj->nodesetval->nodeNr : 0;
   if (size == 0) {
+    fprintf(stderr, "no nodes in set\n");
     xmlXPathFreeObject(xpathObj);
     return NULL;
   }
