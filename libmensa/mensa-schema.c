@@ -497,7 +497,7 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
   }
   
   /* ltrim, rtrim: remove leading and trailing whitespaces */
-  len = strlen(buffer);
+/*  len = strlen(buffer);
   for (i = len-1; i >= 0; i--) {
     if (buffer[i] == ' ' ||
         buffer[i] == '\t' ||
@@ -505,8 +505,8 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
         buffer[i] == 0xa) {
       buffer[i] = '\0';
     }
-    else if (buffer[i] == (char)0xa0 && i > 0 && buffer[i-1] == (char)0xc2) {  /*no-break space, U+00A0 (0xc2 0xa0)*/
-      /* need type conversion, because a0 < 0 for signed char (compare signed with unsigned otherwise) */
+    else if (buffer[i] == (char)0xa0 && i > 0 && buffer[i-1] == (char)0xc2) {  *//*no-break space, U+00A0 (0xc2 0xa0)*/
+      /* need type conversion, because a0 < 0 for signed char (compare signed with unsigned otherwise) *//*
       buffer[i] = buffer[i-1] = '\0';
       i--;
     }
@@ -520,22 +520,31 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
         buffer[i] != '\t' &&
         buffer[i] != 0xa &&
         buffer[i] != 0xd) {
-      if (buffer[i] != (char)0xc2 || buffer[i+1] != (char)0xa0) {  /*no-break space, U+00A0 (0xc2 0xa0)*/
-        break;
+      if (buffer[i] != (char)0xc2 || buffer[i+1] != (char)0xa0) {  *//*no-break space, U+00A0 (0xc2 0xa0)*/
+/*        break;
       }
       else {
         i++;
       }
     }
     i++;
-  } while (buffer[i] != '\0');
+  } while (buffer[i] != '\0');*/
+  mensa_string_beautify(buffer, 1);
   
   xmlXPathFreeObject(xpathObj);
-  if (buffer[i] != '\0') { /* i.e. strlen == 0 */
-    return strdup(&buffer[i]);
+  
+  if (buffer[0] != '\0') {
+    return strdup(buffer);
   }
   else {
     return NULL;
   }
+  
+/*  if (buffer[i] != '\0') {*/ /* i.e. strlen == 0 *//*
+    return strdup(&buffer[i]);
+  }
+  else {
+    return NULL;
+  }*/
 }
 

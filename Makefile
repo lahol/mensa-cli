@@ -1,7 +1,7 @@
 include Makefile.inc
 
 DIRS = libmensa
-OBJS = main.o defaults.o commands.o
+OBJS = main.o defaults.o commands.o mensa-output.o
 OBJLIBS = libmensa.a
 CFLAGS = $(PRJFLAGS) -I. -I./libmensa 
 LDFLAGS = -L./libmensa
@@ -19,6 +19,9 @@ defaults.o: defaults.c defaults.h
 
 commands.o: commands.c commands.h defaults.h
 	$(CC) $(CFLAGS) -c -o commands.o commands.c
+	
+mensa-output.o: mensa-output.c mensa-output.h
+	$(CC) $(CFLAGS) -c -o mensa-output.o mensa-output.c
 	
 #libmensa.so: mensa.o
 #	$(CC) $(CFLAGS) -shared -o libmensa.so mensa.o

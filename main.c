@@ -6,10 +6,9 @@
 #include "commands.h"
 #include "defaults.h"
 #include "mensa.h"
+#include "mensa-output.h"
 
 int parse_cmdline(int argc, char **argv);
-
-void output_fixed_len_str(FILE *stream, char *str, int len);
 
 int cmd_help(int argc, char **argv) {
   if (argc == 2) {
@@ -43,7 +42,7 @@ int cmd_show(int argc, char **argv) {
   int day = 1;
   int flag;
   char type_string[256];
-  int type_str_len = 14;
+  int type_str_len = 16;
 
   printf("Show\n");
   
@@ -82,8 +81,10 @@ int cmd_show(int argc, char **argv) {
       else {
         sprintf(type_string, "Meal %d", i+1);
       }
-      output_fixed_len_str(stdout, type_string, type_str_len);
-      printf(": %s\n", group->meals[i].description);
+      mensa_output_fixed_len_str(stdout, type_string, type_str_len);
+      printf(": ");
+      mensa_output_block(stdout, group->meals[i].description,
+        62, 18, 0);
     }
   }
   else {
@@ -155,39 +156,3 @@ int parse_cmdline(int argc, char **argv) {
   return 0;
 }
 
-/* print a fixed length string, taking care of utf-8 characters
- * these are assumed to be correct */
-void output_fixed_len_str(FILE *stream, char *str, int len) {
-  int k = 0, l = 0;
-  FILE *s = stream ? stream : stdout;
-  if (!str) {
-    for (k = 0; k < len; k++) {
-      fputc(' ', s);
-    }
-    return;
-  }
-  while (str[k] != '\0') {
-    if ((str[k] & 0x80) == 0) {
-      fputc(str[k++], s);
-    }
-    else if ((str[k] & 0xe0) == 0xc0) {
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-    }
-    else if ((str[k] & 0xf0) == 0xe0) {
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-    }
-    else if ((str[k] & 0xf8) == 0xf0) {
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-    }
-    l++;
-  }
-  for (; l < len; l++) {
-    fputc(' ', stream);
-  }
-}
