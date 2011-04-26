@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <ctype.h>
 #include "commands.h"
 #include "defaults.h"
 #include "mensa.h"
@@ -36,15 +37,32 @@ int cmd_info(int argc, char **argv) {
 int cmd_show(int argc, char **argv) {
   mensaSchema *schema = NULL;
   int i;
+  int day = 1;
+  int flag;
 
   printf("Show\n");
   
-  schema = mensa_schema_read_from_file(NULL);
+  schema = mensa_schema_read_from_file("/home/lahol/Projekte/mensa/data/mensa-tuc-rh-schema.xml");
   if (!schema) {
     fprintf(stderr, "Error reading schema.\n");
     return 1;
   }
-  MensaMealGroup *group = mensa_get_meals(schema, 0, 0, 0);
+  
+  if (argc >= 3) {
+    i = 0;
+    flag = 1;
+    while (argv[2][i] != '\0') {
+      if (!isdigit(argv[2][i++])) {
+        flag = 0;
+        break;
+      }
+    }
+    if (flag) {
+      day = atoi(argv[2]);
+    }
+  }
+  
+  MensaMealGroup *group = mensa_get_meals(schema, day, 0, 0);
   if (!group) {
     fprintf(stderr, "Error reading meals.\n");
     mensa_schema_free(schema);

@@ -32,20 +32,17 @@ struct _mensaSchemaSourceFood {
   int week;         /**< 0 is the current week, 1 the next and so on. */
   int day;          /**< 0-6, 0 sunday */
   char *path;       /**< xpath to the field of the food */
-  char *data_path;  /**< xpath to get the data, relative to the main path */
+  char *desc_path;  /**< relative path to the description */
+  /*char *data_path;*/  /**< xpath to get the data, relative to the main path */
 };
 
 struct _mensaSchemaFoodDescription {
-  char *desc_path;   /**< xpath to get the description, relative to the main path */
+/*  char *desc_path;*/   /**< xpath to get the description, relative to the main path */
   char *identifier;  /**< the identifier of the description */
   char *description; /**< the human readable description */
 };
 
 struct _mensaSchema {
-/*  char generic_path[512];
-  int *day_food; *//* number for day, number for food */
-/*  int ndays;
-  int nfoods;*/
   char *schemaName;                     /**< identifier of the schema */
   struct _mensaSchemaSource *sources;   /**< sources of the schema */
   int nsources;                         /**< number of sources of the schema */
@@ -58,66 +55,234 @@ struct _mensaSchema {
 #define BUFFER_SIZE    2048
 
 mensaSchema * mensa_schema_read_from_file(const char *filename) {
-  mensaSchema *schema = malloc(sizeof(mensaSchema));
+  mensaSchema *schema = NULL;
+  xmlDocPtr doc = NULL;
+  xmlNodePtr cur;
+  xmlNodePtr root;
+  xmlChar *content;
+  mensaList *source_list = NULL;
+  mensaList *fdesc_list = NULL;
+  mensaList *food_list = NULL;
+  mensaList *tmp = NULL;
+  struct _mensaSchemaSource *source = NULL;
+  struct _mensaSchemaSourceFood *food = NULL;
+  struct _mensaSchemaFoodDescription *fdesc = NULL;
+  
+  int i; 
+  
+  if (!filename) {
+    fprintf(stderr, "Invalid filename.\n");
+    return NULL;
+  }
+  
+  doc = xmlParseFile(filename);
+  if (!doc) {
+    fprintf(stderr, "Could not parse file.\n");
+    return NULL;
+  }
+  
+  schema = malloc(sizeof(mensaSchema));
   assert(schema);
-  schema->schemaName = strdup("tu-chemnitz.de-rh");
-
-  schema->nsources = 1;
+  memset(schema, 0, sizeof(mensaSchema));
+  
+  root = xmlDocGetRootElement(doc);
+  
+  if (!root || !root->name || !xmlStrcmp(root->name, (const xmlChar*)"mensaprofile")) {
+    xmlFreeDoc(doc);
+    free(schema);
+    fprintf(stderr, "Invalid root element.\n");
+    return NULL;
+  }
+  
+  for (cur = root->children; cur; cur = cur->next) {
+    if (cur->type == XML_ELEMENT_NODE) {
+      if (!xmlStrcmp(cur->name, (const xmlChar*)"name")) {
+        content = xmlNodeGetContent(cur);
+        if (content) {
+          if (!schema->schemaName) {
+            schema->schemaName = strdup((char*)content);
+            xmlFree(content);
+          }
+        }
+      }
+      else if (!xmlStrcmp(cur->name, (const xmlChar*)"source")) {
+        source = malloc(sizeof(struct _mensaSchemaSource));
+        assert(source);
+        memset(source, 0, sizeof(struct _mensaSchemaSource));
+        
+        content = xmlGetProp(cur, (const xmlChar*)"id");
+        if (content) {
+          source->id = atoi((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          source->id = -1;
+        }
+        
+        content = xmlGetProp(cur, (const xmlChar*)"format");
+        if (content) {
+          if (!xmlStrcasecmp(content, "html")) {
+            source->format = MENSA_SOURCE_FORMAT_HTML;
+          }
+          else if (!xmlStrcasecmp(content, "xml")) {
+            source->format = MENSA_SOURCE_FORMAT_XML;
+          }
+          else {
+            source->format = 0;
+          }
+          xmlFree(content);
+        }
+        else {
+          source->format = 0;
+        }
+        
+        content = xmlGetProp(cur, (const xmlChar*)"flags");
+        if (content) {
+          source->flags = atoi((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          source->flags = 0;
+        }
+        
+        content = xmlGetProp(cur, (const xmlChar*)"file");
+        if (content) {
+          source->source = strdup((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          source->source = NULL;
+        }
+        
+        source_list = mensa_list_prepend(source_list, (void*)source);
+        schema->nsources++;
+        source = NULL;
+      }
+      else if (!xmlStrcmp(cur->name, (const xmlChar*)"fooddescription")) {
+        fdesc = malloc(sizeof(struct _mensaSchemaFoodDescription));
+        assert(fdesc);
+        memset(fdesc, 0, sizeof(struct _mensaSchemaFoodDescription));
+        
+        content = xmlGetProp(cur, (const xmlChar*)"identifier");
+        if (content) {
+          fdesc->identifier = strdup((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          fdesc->identifier = NULL;
+        }
+        
+        content = xmlNodeGetContent(cur);
+        if (content) {
+          fdesc->description = strdup((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          fdesc->description = NULL;
+        }
+        
+        fdesc_list = mensa_list_prepend(fdesc_list, (void*)fdesc);
+        schema->nfdescs++;
+        fdesc = NULL;
+      }
+      else if (!xmlStrcmp(cur->name, (const xmlChar*)"food")) {
+        food = malloc(sizeof(struct _mensaSchemaSourceFood));
+        assert(food);
+        memset(food, 0, sizeof(struct _mensaSchemaSourceFood));
+        
+        content = xmlGetProp(cur, (const xmlChar*)"source");
+        if (content) {
+          food->source_id = atoi((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          food->source_id = -2;
+        }
+        
+        content = xmlGetProp(cur, (const xmlChar*)"week");
+        if (content) {
+          food->week = atoi((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          food->week = -1;
+        }
+        
+        content = xmlGetProp(cur, (const xmlChar*)"day");
+        if (content) {
+          food->day = atoi((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          food->day = -1;
+        }
+        
+        content = xmlGetProp(cur, (const xmlChar*)"path");
+        if (content) {
+          food->path = strdup((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          food->path = NULL;
+        }
+        
+        content = xmlGetProp(cur, (const xmlChar*)"description");
+        if (content) {
+          food->desc_path = strdup((const char*)content);
+          xmlFree(content);
+        }
+        else {
+          food->desc_path = NULL;
+        }
+        
+        food_list = mensa_list_prepend(food_list, (void*)food);
+        schema->nfoods++;
+        food = NULL;
+      }
+    }
+  }
+  
   schema->sources = malloc(sizeof(struct _mensaSchemaSource)*schema->nsources);
-  schema->sources[0].id = 1;
-  schema->sources[0].format = MENSA_SOURCE_FORMAT_HTML;
-  schema->sources[0].source = strdup("/home/lahol/Projekte/mensa/sources/web_RH.html");
-  schema->sources[0].flags = 0;
+  assert(schema->sources);
+  schema->foods   = malloc(sizeof(struct _mensaSchemaSourceFood)*schema->nfoods);
+  assert(schema->foods);
+  schema->fdescs  = malloc(sizeof(struct _mensaSchemaFoodDescription)*schema->nfdescs);
+  assert(schema->fdescs);
   
-  schema->nfoods = 5;
-  schema->foods = malloc(sizeof(struct _mensaSchemaSourceFood)*schema->nfoods);
-  schema->foods[0].source_id = 1;
-  schema->foods[0].week = 0;
-  schema->foods[0].day = 5;
-  schema->foods[0].path = strdup("/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[2]/td[5]/table/tbody/");
-  schema->foods[0].data_path = strdup("tr[2]/td"); /** TODO: geht für desc evtl. auch ../../tr[1]/td für xpath? */
-    /* dann kann man sich das feld auch sparen*/
-  schema->foods[1].source_id = 1;
-  schema->foods[1].week = 0;
-  schema->foods[1].day = 5;
-  schema->foods[1].path = strdup("/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[3]/td[5]/table/tbody/");
-  schema->foods[1].data_path = strdup("tr[2]/td"); /** TODO: geht für desc evtl. auch ../../tr[1]/td für xpath? */
-  schema->foods[2].source_id = 1;
-  schema->foods[2].week = 0;
-  schema->foods[2].day = 1;
-  schema->foods[2].path = strdup("/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[4]/td[1]/table/tbody/");
-  schema->foods[2].data_path = strdup("tr[2]/td"); /** TODO: geht für desc evtl. auch ../../tr[1]/td für xpath? */
-  schema->foods[3].source_id = 1;
-  schema->foods[3].week = 0;
-  schema->foods[3].day = 1;
-  schema->foods[3].path = strdup("/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[5]/td[1]/table/tbody/");
-  schema->foods[3].data_path = strdup("tr[2]/td"); /** TODO: geht für desc evtl. auch ../../tr[1]/td für xpath? */
-  schema->foods[4].source_id = 1;
-  schema->foods[4].week = 0;
-  schema->foods[4].day = 1;
-  schema->foods[4].path = strdup("/html/body/div/table[2]/tbody/tr/td/table/tbody/tr[6]/td[1]/table/tbody/");
-  schema->foods[4].data_path = strdup("tr[2]/td"); /** TODO: geht für desc evtl. auch ../../tr[1]/td für xpath? */
+  tmp = NULL;
+  for (i = schema->nsources-1; i >= 0; i--) {
+    if (source_list) {
+      memcpy(&schema->sources[i], source_list->data, sizeof(struct _mensaSchemaSource));
+      tmp = source_list->next;
+      free((struct _mensaSchemaSource*)source_list->data);
+      free(source_list);
+      source_list = tmp;
+    }
+  }
   
-  schema->nfdescs = 6;
-  schema->fdescs = malloc(sizeof(struct _mensaSchemaFoodDescription)*schema->nfdescs);
-  schema->fdescs[0].desc_path = strdup("tr[1]/td");
-  schema->fdescs[0].identifier = strdup("Hauptessen 1");
-  schema->fdescs[0].description = strdup("Essen 1");
-  schema->fdescs[1].desc_path = strdup("tr[1]/td");
-  schema->fdescs[1].identifier = strdup("Hauptessen 2");
-  schema->fdescs[1].description = strdup("Essen 2");
-  schema->fdescs[2].desc_path = strdup("tr[1]/td");
-  schema->fdescs[2].identifier = strdup("Hauptessen 3");
-  schema->fdescs[2].description = strdup("Essen 3");
-  schema->fdescs[3].desc_path = strdup("tr[1]/td");
-  schema->fdescs[3].identifier = strdup("Hauptessen 4");
-  schema->fdescs[3].description = strdup("Essen 4");
-  schema->fdescs[4].desc_path = strdup("tr[1]/td");
-  schema->fdescs[4].identifier = strdup("Abendessen 3");
-  schema->fdescs[4].description = strdup("Abendessen 3");
-  schema->fdescs[5].desc_path = strdup("tr[1]/td");
-  schema->fdescs[5].identifier = strdup("Gemüsebar");
-  schema->fdescs[5].description = strdup("Gemüsebar");
+  tmp = NULL;
+  for (i = schema->nfdescs-1; i >= 0; i--) {
+    if (fdesc_list) {
+      memcpy(&schema->fdescs[i], fdesc_list->data, sizeof(struct _mensaSchemaFoodDescription));
+      tmp = fdesc_list->next;
+      free((struct _mensaSchemaFoodDescription*)fdesc_list->data);
+      free(fdesc_list);
+      fdesc_list = tmp;
+    }
+  }
+  
+  tmp = NULL;
+  for (i = schema->nfoods-1; i >= 0; i--) {
+    if (food_list) {
+      memcpy(&schema->foods[i], food_list->data, sizeof(struct _mensaSchemaSourceFood));
+      tmp = food_list->next;
+      free((struct _mensaSchemaSourceFood*)food_list->data);
+      free(food_list);
+      food_list = tmp;
+    }
+  }
+ 
+  xmlFreeDoc(doc);
   
   return schema;
 }
@@ -169,9 +334,9 @@ MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, int week, int day) 
         }
       }
       if (cur_doc) {
-        strcpy(path, schema->foods[i].path);
-        strcat(path, schema->foods[i].data_path);
-        data = _mensa_schema_get_data(cur_doc, path);
+        /*strcpy(path, schema->foods[i].path);
+        strcat(path, schema->foods[i].data_path);*/
+        data = _mensa_schema_get_data(cur_doc, schema->foods[i].path);
         if (data) {
           list = mensa_list_prepend(list, (void*)data);
           count++;
@@ -265,6 +430,7 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
   
   xpathObj = xmlXPathEvalExpression((xmlChar*)path, doc->xpathCtx);
   if (!xpathObj) {
+    fprintf(stderr, "could not evaluate expression\n");
     return NULL;
   }
   
