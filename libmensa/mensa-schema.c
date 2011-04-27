@@ -473,7 +473,6 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
   /* get nodeset data for xpathObj->nodesetval */
   size = (xpathObj->nodesetval) ? xpathObj->nodesetval->nodeNr : 0;
   if (size == 0) {
-    fprintf(stderr, "no nodes in set\n");
     xmlXPathFreeObject(xpathObj);
     return NULL;
   }
