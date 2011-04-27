@@ -85,23 +85,27 @@ int _mensa_output_block_line(FILE *stream, char *str, int length) {
   int len;
   int i,d;
   int last_space;
+  int offset = 0;
   FILE *s = stream ? stream : stdout;
   
+  /* skip leading spaces but be aware of the complete offset; needs work */
+  while (str[offset] == ' ') { offset++; }
+  if (offset) str = &str[offset];
+
   len = strlen(str);
   if (len <= length) { /* nothing to cut of, write to output */
     for (i = 0; str[i] != '\0'; i++) {
       fputc(str[i], s);
     }
     fputc('\n', s);
-    return len;
+    return len+offset;
   }
   
   i = 0; d = 0;
   last_space = 0;
-/*  while (str[d] == ' ') d++;*/
   /* could be done simpler, but we want to take care of utf-8 characters */
   while (i < length && str[i+d] != '\0') {
-    if (str[i+d] == ' ' || str[i+d] == ',' ||
+    if (str[i+d] == ' ' || str[i+d] == ',' || str[i+d] == '-' ||
         str[i+d] == ';' || str[i+d] == '.' || str[i+d] == ':') {
       last_space = i+d;
     }
@@ -119,13 +123,12 @@ int _mensa_output_block_line(FILE *stream, char *str, int length) {
   if (last_space == 0) { /* no spaces up to length, cut of */
     last_space = i+d-1; /* -1 ? */
   }
-  d = 0;
-/*  while (str[d] == ' ') d++;*/
-  for (i = d; i <= last_space+d; i++) {
+
+  for (i = 0; i <= last_space; i++) {
     fputc(str[i], s);
   }
   fputc('\n', s);
-  return last_space+1;
+  return last_space+1+offset;
 }
 
 int mensa_output_get_term_width(void) {
