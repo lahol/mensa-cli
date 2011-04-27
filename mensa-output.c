@@ -106,7 +106,10 @@ int _mensa_output_block_line(FILE *stream, char *str, int length) {
   /* could be done simpler, but we want to take care of utf-8 characters */
   while (i < length && str[i+d] != '\0') {
     if (str[i+d] == ' ' || str[i+d] == ',' || str[i+d] == '-' ||
-        str[i+d] == ';' || str[i+d] == '.' || str[i+d] == ':') {
+        str[i+d] == ';' || 
+         (str[i+d] == '.' && (str[i+d+1] != ',' && str[i+d+1] != ';'
+          && str[i+d+1] != '-'))
+        || str[i+d] == ':') {
       last_space = i+d;
     }
     else if ((str[i+d] & 0xe0) == 0xc0) {
