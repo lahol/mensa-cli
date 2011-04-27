@@ -9,7 +9,7 @@ LDFLAGS = -L./libmensa
 all: mensa libmensa.a
 
 mensa: $(OBJS) $(OBJLIBS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o mensa $(OBJS) $(LIBS) -lmensa `xml2-config --cflags --libs`
+	$(CC) $(CFLAGS) $(LDFLAGS) -o mensa $(OBJS) $(LIBS) -lmensa `xml2-config --cflags --libs` -ltermcap
 
 main.o: main.c defaults.h commands.h
 	$(CC) $(CFLAGS) -c -o main.o main.c

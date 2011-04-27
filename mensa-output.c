@@ -3,6 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <curses.h>
+#include <term.h>
+#ifdef unix
+static char term_buffer[2048];
+#else
+#define term_buffer 0
+#endif
+
 /* print a fixed length string, taking care of utf-8 characters
  * these are assumed to be correct */
 void mensa_output_fixed_len_str(FILE *stream, char *str, int len) {
@@ -90,9 +98,11 @@ int _mensa_output_block_line(FILE *stream, char *str, int length) {
   
   i = 0; d = 0;
   last_space = 0;
+/*  while (str[d] == ' ') d++;*/
   /* could be done simpler, but we want to take care of utf-8 characters */
   while (i < length && str[i+d] != '\0') {
-    if (str[i+d] == ' ') {
+    if (str[i+d] == ' ' || str[i+d] == ',' ||
+        str[i+d] == ';' || str[i+d] == '.' || str[i+d] == ':') {
       last_space = i+d;
     }
     else if ((str[i+d] & 0xe0) == 0xc0) {
@@ -109,9 +119,24 @@ int _mensa_output_block_line(FILE *stream, char *str, int length) {
   if (last_space == 0) { /* no spaces up to length, cut of */
     last_space = i+d-1; /* -1 ? */
   }
-  for (i = 0; i <= last_space; i++) {
+  d = 0;
+/*  while (str[d] == ' ') d++;*/
+  for (i = d; i <= last_space+d; i++) {
     fputc(str[i], s);
   }
   fputc('\n', s);
   return last_space+1;
+}
+
+int mensa_output_get_term_width(void) {
+  char *termtype = getenv("TERM");
+  if (termtype == NULL) {
+    return -1;
+  }
+  
+  if (tgetent(term_buffer, termtype) <= 0) {
+    return -1;
+  }
+  
+  return tgetnum("co");
 }

@@ -52,6 +52,8 @@ int cmd_show(int argc, char **argv) {
   mensaDate date;
   struct tm show_tm;
   time_t timestamp;
+  int term_width = mensa_output_get_term_width();
+  if (term_width == -1) term_width = 80;
   /*i = 2;*/
    /*try every command for time */
 /*  while (!arg_time && i < argc) {
@@ -108,7 +110,7 @@ int cmd_show(int argc, char **argv) {
     timestamp = mktime(&show_tm);
     memcpy(&show_tm, localtime(&timestamp), sizeof(struct tm));
     if (strftime(format_header, 512, header, &show_tm)) {
-      mensa_output_block(stdout, format_header, 80, 0, 1);
+      mensa_output_block(stdout, format_header, term_width, 0, 1);
     }
   }
 
@@ -123,7 +125,7 @@ int cmd_show(int argc, char **argv) {
       mensa_output_fixed_len_str(stdout, type_string, type_str_len);
       printf(": ");
       mensa_output_block(stdout, group->meals[i].description,
-        62, 18, 0);
+        term_width-18, 18, 0);
     }
   }
   else {
