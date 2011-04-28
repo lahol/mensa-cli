@@ -15,6 +15,10 @@
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 
+#define _XOPEN_SOURCE   /* glibc2 needs this */
+#include <time.h>
+
+
 #define MENSA_SOURCE_FORMAT_HTML     1
 #define MENSA_SOURCE_FORMAT_XML      2
 
@@ -298,11 +302,12 @@ struct _SchemaSourceDoc {
   xmlXPathContextPtr xpathCtx;
 };
 
-struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *source);
+struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *source,
+                                                    mensaDate *date);
 void _mensa_schema_free_source_doc(struct _SchemaSourceDoc *doc);
 char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path);
 
-MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, int week, int day) {
+MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, mensaDate *date) {
   struct _SchemaSourceDoc **docs = NULL;
   struct _SchemaSourceDoc *cur_doc = NULL;
   char path[BUFFER_SIZE];
@@ -317,19 +322,20 @@ MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, int week, int day) 
   struct _mensaSchemaSource *source;
   char *data;
   if (!schema) return NULL;
+  if (!date) return NULL;
   if (schema->nsources == 0 || schema->nfoods == 0) return NULL;
   
   docs = malloc(sizeof(struct _SchemaSourceDoc*)*schema->nsources);
   memset(docs, 0, sizeof(struct _SchemaSourceDoc*)*schema->nsources);
   
   for (i = 0; i < schema->nfoods; i++) {
-    if (schema->foods[i].week == week && 
-        schema->foods[i].day == day) {
+    if ((schema->foods[i].week == date->week || schema->foods[i].week == -1) && 
+        (schema->foods[i].day == date->dow || schema->foods[i].day == -1)) {
       cur_doc = NULL;
       for (j = 0; j < schema->nsources; j++) {
         if (schema->sources[j].id == schema->foods[i].source_id) {
           if (!docs[j]) {
-            docs[j] = _mensa_schema_read_source(&schema->sources[j]);
+            docs[j] = _mensa_schema_read_source(&schema->sources[j], date);
           }
           cur_doc = docs[j];
           break;
@@ -406,30 +412,71 @@ MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, int week, int day) 
   return group;
 }
 
-struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *source) {
+struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *source,
+                                                    mensaDate *date) {
+  char path_buf[2048];
+  struct _SchemaSourceDoc *doc = NULL;
+  struct tm tm;
+  struct tm *clt;
+  time_t timestamp;
+  
   if (!source) return NULL;
   if (!source->source) return NULL;
-  struct _SchemaSourceDoc *doc = malloc(sizeof(struct _SchemaSourceDoc));
-  assert(doc);
-  if (source->format == MENSA_SOURCE_FORMAT_HTML) {
-    doc->doc = htmlReadFile(source->source, NULL, 0);
-  }
-  else if (source->format == MENSA_SOURCE_FORMAT_HTML) {
-    doc->doc = xmlReadFile(source->source, NULL, 0);
+  if (!date) return NULL;
+  if (source->flags == 0) {
+    strcpy(path_buf, source->source);
   }
   else {
+    if (!date) return NULL;
+    time(&timestamp);
+    clt = localtime(&timestamp);
+    tm.tm_mday = date->day;
+    tm.tm_mon = date->month-1;
+    tm.tm_year = date->year-1900;
+    tm.tm_hour = clt->tm_hour;
+    tm.tm_min = clt->tm_min;
+    tm.tm_sec = clt->tm_sec;
+    timestamp = mktime(&tm);
+    memcpy(&tm, localtime(&timestamp), sizeof(struct tm));
+    strftime(path_buf, 2048, source->source, &tm);
+  }
+
+  doc = malloc(sizeof(struct _SchemaSourceDoc));
+  assert(doc);
+  if (source->format == MENSA_SOURCE_FORMAT_HTML) {
+    doc->doc = htmlReadFile(path_buf, NULL, 0);
+  }
+  else if (source->format == MENSA_SOURCE_FORMAT_XML) {
+    doc->doc = xmlReadFile(path_buf, NULL, 0);
+  }
+  else {
+    fprintf(stderr, "Unknown document format.\n");
     free(doc);
     return NULL;
   }
   
   if (!doc->doc) {
+    fprintf(stderr, "Error parsing document.\n");
     free(doc);
     return NULL;
   }
   
+/*  xmlNodePtr root = xmlDocGetRootElement(doc->doc);
+  if (root) {
+    fprintf(stderr, "root-element: \"%s\"\n", (char*)root->name);
+    if (root->nsDef) {
+      fprintf(stderr, " ns-prefix: \"%s\"\n", root->nsDef->prefix);
+      fprintf(stderr, " ns-href  : \"%s\"\n", root->nsDef->href);
+    }
+  }
+  else {
+    fprintf(stderr, "no root-element\n");
+  }*/
+  
   /* get context */
   doc->xpathCtx = xmlXPathNewContext(doc->doc);
   if (!doc->xpathCtx) {
+    fprintf(stderr, "Could not create context.\n");
     xmlFreeDoc(doc->doc);
     free(doc);
     return NULL;
@@ -450,6 +497,31 @@ void _mensa_schema_free_source_doc(struct _SchemaSourceDoc *doc) {
   }
 }
 
+void _print_children(xmlNode *node, int level) {
+  if (!node) return;
+  xmlNode *cur;
+  int i;
+  for (cur = node->children; cur != NULL; cur = cur->next) {
+    for (i = 0; i < level; i++) putc(' ', stderr);
+    if (cur->type == XML_TEXT_NODE) {
+      fputs((char*)cur->content, stderr);
+      fputc('\n', stderr);
+    }
+    else {
+      fputc('\"', stderr);
+      fputs(cur->name, stderr);
+      fputc('\"', stderr);
+      if (cur->nsDef) {
+        fprintf(stderr, " (ns-prefix: \"%s\")", cur->nsDef->prefix);
+      }
+      fprintf(stderr, " (type: %d)", cur->type);
+      fputc('\n', stderr);
+      
+    }
+    _print_children(cur, level+1);
+  }
+}
+
 char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
   xmlXPathObjectPtr xpathObj;
   char buffer[BUFFER_SIZE];
@@ -462,7 +534,7 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
     return NULL;
   }
   
-  xpathObj = xmlXPathEvalExpression((xmlChar*)path, doc->xpathCtx);
+  xpathObj = xmlXPathEval((xmlChar*)path, doc->xpathCtx);
   if (!xpathObj) {
     fprintf(stderr, "could not evaluate expression\n");
     return NULL;

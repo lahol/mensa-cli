@@ -62,7 +62,7 @@ int cmd_show(int argc, char **argv) {
 
   defaults_get("show.header", header);
   
-  schema = mensa_schema_read_from_file("/home/lahol/Projekte/mensa/data/mensa-tuc-rh-schema.xml");
+  schema = mensa_schema_read_from_file("/home/lahol/Projekte/mensa/data/mensa-tuc-rh-fnor-schema.xml");
   if (!schema) {
     fprintf(stderr, "Error reading schema.\n");
     return 1;
