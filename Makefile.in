@@ -1,15 +1,25 @@
-include Makefile.inc
+CC       = @CC@
+AR       = @AR@
+ARFLAGS  = 
+RANLIB   = @RANLIB@
+INCS     = 
+LIBS     = -lc
+#PRJFLAGS = -Wall $(INCS) -ggdb
+RM       = @RM@
+LD       = @LD@
+MAKE     = make
 
 DIRS = libmensa
+BIN = mensa
 OBJS = main.o defaults.o commands.o mensa-output.o
-OBJLIBS = libmensa.a
-CFLAGS = $(PRJFLAGS) -I. -I./libmensa 
-LDFLAGS = -L./libmensa
+LIBS = -lmensa
+CFLAGS = @CFLAGS@ @DEFS@
+LDFLAGS = @LDFLAGS@ @LIBS@
 
 all: mensa libmensa.a
 
-mensa: $(OBJS) $(OBJLIBS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o mensa $(OBJS) $(LIBS) -lmensa `xml2-config --cflags --libs` -ltermcap
+$(BIN): $(OBJS) libmensa.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o mensa $(OBJS) $(LIBS)
 
 main.o: main.c defaults.h commands.h
 	$(CC) $(CFLAGS) -c -o main.o main.c
@@ -29,7 +39,7 @@ libmensa.a: force_look
 	cd libmensa; $(MAKE) $(MFLAGS)
 
 clean:
-	rm -f *.o mensa
+	$(RM) -f $(BIN) $(OBJS)
 	for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
 
 force_look:

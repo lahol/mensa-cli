@@ -7,7 +7,7 @@
 #include <libintl.h>
 #include "commands.h"
 #include "defaults.h"
-#include "mensa.h"
+#include "libmensa/mensa.h"
 #include "mensa-output.h"
 #define _XOPEN_SOURCE
 #include <time.h>

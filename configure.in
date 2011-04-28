@@ -1,0 +1,32 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+dnl configure.in
+AC_PREREQ([2.67])
+AC_INIT([Mensa CLI], [0.1], [holger.langenau@s2004.tu-chemnitz.de])
+AC_CONFIG_SRCDIR([commands.c])
+AC_CONFIG_HEADERS([config.h])
+
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+# Checks for libraries.
+# FIXME: Replace `main' with a function in `-lc':
+AC_CHECK_LIB([c], [memcpy])
+AC_CHECK_LIB([termcap], [tgetent])
+
+# Checks for header files.
+AC_CHECK_HEADERS([libintl.h locale.h memory.h stdlib.h string.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_FUNC_MKTIME
+AC_CHECK_FUNCS([memset setlocale strcasecmp strdup])
+
+AC_CONFIG_FILES([Makefile
+                 libmensa/Makefile])
+AC_OUTPUT
