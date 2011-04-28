@@ -68,25 +68,6 @@ int cmd_show(int argc, char **argv) {
     return 1;
   }
   
-/*  mensa_translate_date(26, 4, 2011, &day, NULL);
-  mensa_translate_date(1, 5, 2011, &day, NULL);
-  mensa_translate_date(2, 5, 2011, &day, NULL);
-  mensa_translate_date(27, 4, 2011, &day, NULL);*/
-  
-/*  if (argc >= 3) {
-    i = 0;
-    flag = 1;
-    while (argv[2][i] != '\0') {
-      if (!isdigit(argv[2][i++])) {
-        flag = 0;
-        break;
-      }
-    }
-    if (flag) {
-      day = atoi(argv[2]);
-    }
-  }*/
-  
   if (argc >= 3) {
     mensa_parse_time(argv[2], &date);
   }
