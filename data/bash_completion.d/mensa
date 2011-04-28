@@ -1,0 +1,28 @@
+_mensa()
+{
+	local cur prev cmds days
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	cmds="help info show config"
+  days="today tomorrow monday tuesday wednesday thursday friday saturday sunday"
+
+  if [[ ${COMP_CWORD} == 1 ]] ; then
+  	COMPREPLY=( $(compgen -W "${cmds}" -- ${cur}) )
+		return 0
+	fi
+
+  case "${prev}" in
+		show)
+			COMPREPLY=( $(compgen -W "${days}" -- ${cur}) )
+			return 0
+			;;
+		help)
+			COMPREPLY=( $(compgen -W "${cmds}" -- ${cur}) )
+			return 0
+			;;
+		*)
+		;;
+	esac
+}
+complete -F _mensa mensa
