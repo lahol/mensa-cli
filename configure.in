@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 dnl configure.in
-AC_PREREQ([2.67])
+AC_PREREQ([2.65])
 AC_INIT([Mensa CLI], [0.1], [holger.langenau@s2004.tu-chemnitz.de])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/main.c])
@@ -24,6 +24,11 @@ CFLAGS="$CFLAGS $XML2_CFLAGS"
 
 # Checks for header files.
 AC_CHECK_HEADERS([libintl.h locale.h memory.h stdlib.h string.h])
+AC_CHECK_HEADERS([curses.h term.h], [], [],
+[[#ifdef HAVE_CURSES_H
+#include <curses.h>
+#endif
+]])
 
 # Checks for typedefs, structures, and compiler characteristics.
 
