@@ -5,6 +5,11 @@
 #include <string.h>
 #include <locale.h>
 #include <libintl.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "commands.h"
 #include "defaults.h"
 #include "libmensa/mensa.h"
@@ -14,25 +19,24 @@
 
 int parse_cmdline(int argc, char **argv);
 
+int file_exists(const unsigned char *filename);
+
 int cmd_help(int argc, char **argv) {
-  if (argc == 2) {
+  if (argc <= 2) {
     printf("Usage: %s [cmd [args]]\n", argv[0]);
     printf(
-"\nCommands: \n"
-"    help            Show this help. \n"
-"    info            Show information about this program. \n"
-"    show            Show meals. \n"
-"    config          Show configuration or set values. \n"
-"\n"    
-"Use %s help cmd to show help about this command.\n", argv[0]);
+      "\nCommands: \n"
+      "    help            Show this help. \n"
+      "    info            Show information about this program. \n"
+      "    show            Show meals. \n"
+      "    config          Show configuration or set values. \n"
+      "\n"    
+      "Use %s help cmd to show help about this command.\n", argv[0]);
     return 0;
   }
   else if (argc > 2) {
     return command_help(argv[1]);
   } 
-  else { /* Should never reach this point. */
-    return 1;
-  }
 }
 
 int cmd_info(int argc, char **argv) {
@@ -44,9 +48,9 @@ int cmd_show(int argc, char **argv) {
   mensaSchema *schema = NULL;
   int i;
   int res;
-  char type_string[256];
-  char header[256];
-  char format_header[512];
+  unsigned char type_string[256];
+  unsigned char header[256];
+  unsigned char format_header[512];
   int type_str_len = 16;
   mensaDate date;
   struct tm show_tm;
@@ -130,16 +134,50 @@ int cmd_config(int argc, char **argv) {
 
 int main(int argc, char **argv) {
 /*  parse_cmdline(argc, argv);*/
+  char *rcpath;
+  char *home;
+  int home_len;
   setlocale(LC_ALL, "");
   
-  defaults_read(NULL);
-
   defaults_add("cmd.default", "show");
   defaults_add("show.date", "today");
   defaults_add("show.mensa", "rh");
   defaults_add("show.clear-cache", "no");
   defaults_add("show.header", "Offers for %A, %x");
   defaults_add("show.max-width", "80");
+  
+  home = getenv("HOME");
+  if (home) {
+    home_len = strlen(home);
+  }
+  else {
+    home_len = 0;
+  }
+  rcpath = malloc(sizeof(char)*(home_len+10));
+  if (home) {
+    strcpy(rcpath, home);
+  }
+  else {
+    rcpath[0] = '\0';
+  }
+  
+  /* ensure that last token is no /, we add that later */
+  if (home_len > 0) {
+    if (rcpath[home_len-1] == '/') {
+      rcpath[home_len-1] = '\0';
+    }
+  }
+  
+  strcat(rcpath, "/");
+  strcat(rcpath, ".mensarc");
+  
+  if (file_exists(rcpath)) {
+    if (defaults_read(rcpath) != 0) {
+      defaults_free();
+      return 1;
+    }
+  }
+
   command_add("help", cmd_help, NULL);
   command_add("info", cmd_info, NULL);
   command_add("show", cmd_show, NULL);
@@ -191,3 +229,7 @@ int parse_cmdline(int argc, char **argv) {
   return 0;
 }
 
+int file_exists(const unsigned char *filename) {
+  struct stat f;
+  return stat(filename, &f) == 0 ? 1 : 0;
+}
