@@ -43,8 +43,7 @@ int cmd_info(int argc, char **argv) {
 int cmd_show(int argc, char **argv) {
   mensaSchema *schema = NULL;
   int i;
-  int day = 1;
-  int flag;
+  int res;
   char type_string[256];
   char header[256];
   char format_header[512];
@@ -60,7 +59,7 @@ int cmd_show(int argc, char **argv) {
     arg_time = cmd_parse_time(argv[i]);
   }*/
 
-  defaults_get("show.header", header);
+  defaults_get("show.header", header, 256);
   
   schema = mensa_schema_read_from_file("/home/lahol/Projekte/mensa/data/mensa-tuc-rh-fnor-schema.xml");
   if (!schema) {
@@ -69,11 +68,17 @@ int cmd_show(int argc, char **argv) {
   }
   
   if (argc >= 3) {
-    mensa_parse_time(argv[2], &date);
+    res = mensa_parse_time(argv[2], &date);
   }
   else {
-    mensa_parse_time(NULL, &date);
+    res = mensa_parse_time(NULL, &date);
   }
+  
+  if (res) {
+    fprintf(stderr, "Could not parse date.\n");
+    return 1;
+  }
+  
   mensa_translate_date(&date);
   
   MensaMealGroup *group = mensa_get_meals(schema, &date);
@@ -126,18 +131,23 @@ int cmd_config(int argc, char **argv) {
 int main(int argc, char **argv) {
 /*  parse_cmdline(argc, argv);*/
   setlocale(LC_ALL, "");
+  
+  defaults_read(NULL);
 
   defaults_add("cmd.default", "show");
   defaults_add("show.date", "today");
   defaults_add("show.mensa", "rh");
   defaults_add("show.clear-cache", "no");
   defaults_add("show.header", "Offers for %A, %x");
+  defaults_add("show.max-width", "80");
   command_add("help", cmd_help, NULL);
   command_add("info", cmd_info, NULL);
   command_add("show", cmd_show, NULL);
   command_add("config", cmd_config, NULL);
   
   command_call(argc, argv);
+  
+  defaults_free();
   
   return 0;
 }

@@ -11,7 +11,7 @@ int mensa_parse_time(char *str, mensaDate *date) {
   struct tm *clt;
   struct tm target;
   char *remainder;
-  
+
   if (!date) return 1;
   
   time(&current_time);
@@ -55,6 +55,9 @@ int mensa_parse_time(char *str, mensaDate *date) {
     else if (!strcasecmp(str, "sunday")) {
       target.tm_mday += clt->tm_wday%7;
     }
+    else {
+      return 1;
+    }
     target_time = mktime(&target);
     memcpy(&target, localtime(&target_time), sizeof(struct tm));
   }
@@ -65,17 +68,6 @@ int mensa_parse_time(char *str, mensaDate *date) {
   date->dow = target.tm_wday;
   
   return 0;
-  
-/*  return getdate((const char*)str);*/
-/*  time_t current_time;
-  time(&current_time);
-  struct tm *clt = localtime(current_time);
-  struct tm *res = NULL;
-  if (!clt) return NULL;
-  
-  struct tm target;
-  memset(&target, 0, sizeof(struct tm));
-  target->tm_year = */  
 }
 
 int mensa_translate_date(mensaDate *date) {
@@ -110,8 +102,6 @@ int mensa_translate_date(mensaDate *date) {
 
   date->dow = dy;
   date->week = wk;  
-  
-/*  fprintf(stderr, "%04d-%02d-%02d -> week: %d, day: %d\n", date->year, date->month, date->day, wk, dy);*/
   
   return 0;
 }
