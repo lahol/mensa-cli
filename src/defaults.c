@@ -32,6 +32,7 @@ int _defaults_rc_read_line(FILE *stream,
                            int *type, long *vstart, long *vend);
 void _defaults_rc_skip_spaces(FILE *stream);
 void _defaults_rc_goto_eol(FILE *stream);
+void _defaults_rc_copy_line(FILE *src, FILE *dst);
 
 int defaults_read(unsigned char *filename) {
   FILE *f;
@@ -96,6 +97,18 @@ void _defaults_rc_goto_eol(FILE *stream) {
   do {
     tok = fgetc(stream);
   } while (!feof(stream) && tok != '\n');
+}
+
+void _defaults_rc_copy_line(FILE *src, FILE *dst) {
+  int tok;
+  if (!src || !dst) return;
+  while (1) {
+    tok = fgetc(src);
+    fputc(tok, dst);
+    if (tok == '\n') {
+      return;
+    }
+  }
 }
 
 /** Reads a single line of the rc file and returns a key/value pair
@@ -233,6 +246,124 @@ int _defaults_rc_read_line(FILE *stream,
 }
 
 int defaults_write(unsigned char *filename) {
+  DefaultsList *setting = NULL;
+  FILE *cfgfile = NULL;
+  FILE *tmp = NULL;
+  int file_exists = 0;
+  long vstart, vend;
+  long start, i;
+  unsigned char *key;
+  int ltype;
+  int first;
+  
+  /* no filename specified */
+  if (!filename) {
+    return 1;
+  }
+  
+  /* if file exists read contents from file to tmpfile */
+  /* file could not be read */
+  if ((cfgfile = fopen(filename, "r")) == NULL) {
+    file_exists = 0;
+  }
+  else {
+    file_exists = 1;
+    tmp = tmpfile();
+    if (!tmp) {
+      perror("Could not create temporary file");
+      fclose(cfgfile);
+      return 1;
+    }
+    while (!feof(cfgfile)) {
+      fputc(fgetc(cfgfile), tmp);
+    }
+    rewind(tmp);
+    fclose(cfgfile);
+  }
+  /* check file */
+  if (file_exists && tmp) {
+    while (!feof(tmp)) {
+      if (_defaults_rc_read_line(tmp, NULL, NULL, NULL, NULL, NULL) != 0) {
+        fprintf(stderr, "You have a syntax error in your rc file `%s'.\n",
+                filename);
+        fclose(tmp);
+        return 1;
+      }
+    }
+  }
+  
+  /* open file */
+  if ((cfgfile = fopen(filename, "w")) == NULL) {
+    fprintf(stderr, "Could not open `%s' for writing: ", filename);
+    perror("");
+    fclose(tmp);
+    return 1;
+  }
+  
+  /* read tmpfile line by line and check for setting */
+  if (file_exists && tmp) {
+    rewind(tmp);
+    while (!feof(tmp)) {
+      if (_defaults_rc_read_line(tmp, &key, NULL, &ltype, &vstart, &vend) != 0) {
+        fprintf(stderr, "Unexpected error reading temporary file.\n");
+        fclose(tmp);
+        fclose(cfgfile);
+        return 1;
+      }
+      if (ltype == _DEFAULTS_RC_LINE_KEYVALUE) {
+        if (key) {
+          setting = _defaults_get_key(key);
+          if (setting) {  /* setting exists*/
+            if (setting->flags & DEFAULTS_LIST_FLAG_MODIFIED) {
+              start = ftell(tmp);
+              /* copy line till value */
+              for (i = start; i < vstart; i++) {
+                fputc(fgetc(tmp), cfgfile);
+              }
+              /* write value */
+              if (setting->value) {
+                fprintf(cfgfile, "%s", setting->value);
+              }
+              /* jump to character after value */
+              fseek(tmp, vend, SEEK_SET);
+              /* write rest of line*/
+              _defaults_rc_copy_line(tmp, cfgfile);
+              /* set flag to written */
+              setting->flags |= DEFAULTS_LIST_FLAG_WRITTEN;
+            }
+          }
+        }
+      }
+      else {
+        _defaults_rc_copy_line(tmp, cfgfile);
+      }
+    }
+  }
+  
+  /* write all modified settings that have not been written to cfgfile */
+  setting = _defaults_list;
+  first = 1;
+  while (setting) {
+    if ((setting->flags & DEFAULTS_LIST_FLAG_MODIFIED) &&
+        (setting->flags & DEFAULTS_LIST_FLAG_WRITTEN)) {
+      if (first) {
+        fputc('\n', cfgfile);
+        first = 0;
+      }
+      if (setting->key) {
+        fprintf(cfgfile, "%s = ", setting->key);
+        if (setting->value) {
+          fprintf(cfgfile, "%s", setting->value);
+        }
+        fputc('\n', cfgfile);
+      }
+      setting->flags |= DEFAULTS_LIST_FLAG_WRITTEN;
+    }
+    setting = setting->next;
+  }
+  
+  fclose(tmp);
+  fclose(cfgfile);
   return 0;
 }
 
