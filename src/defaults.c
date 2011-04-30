@@ -10,6 +10,10 @@
 #define DEFAULTS_LIST_FLAG_MODIFIED      1<<0  /**< was modified by user (command) */
 #define DEFAULTS_LIST_FLAG_WRITTEN       1<<1  /**< has been written to rc file */
 
+#define _DEFAULTS_RC_LINE_KEYVALUE       1
+#define _DEFAULTS_RC_LINE_EMPTY          2
+#define _DEFAULTS_RC_LINE_COMMENT        3
+
 typedef struct _DefaultsList DefaultsList;
 struct _DefaultsList {
   unsigned char *key;
@@ -22,11 +26,18 @@ DefaultsList *_defaults_list = NULL;
 
 DefaultsList * _defaults_set(unsigned char *key, unsigned char *value);
 DefaultsList * _defaults_get_key(unsigned char *key);
-int _defaults_rc_read_line(FILE *stream);
+int _defaults_rc_read_line(FILE *stream,
+                           unsigned char **key,
+                           unsigned char **val,
+                           int *type, long *vstart, long *vend);
 void _defaults_rc_skip_spaces(FILE *stream);
+void _defaults_rc_goto_eol(FILE *stream);
 
 int defaults_read(unsigned char *filename) {
   FILE *f;
+  int type;
+  unsigned char *key;
+  unsigned char *val;
   if (!filename) {
     return 1;
   }
@@ -38,10 +49,27 @@ int defaults_read(unsigned char *filename) {
   }
   
   while (!feof(f)) {
-    if (_defaults_rc_read_line(f) != 0) {
+    if (_defaults_rc_read_line(f, &key, &val, &type, NULL, NULL) != 0) {
       fprintf(stderr, "Error parsing rc file.\n");
       fclose(f);
       return 1;
+    }
+    else {
+      if (type == _DEFAULTS_RC_LINE_KEYVALUE) {
+        /* insert to defaults */
+        if (key && val) {
+          defaults_add(key, val);
+        }
+        if (key) {
+          free(key);
+          key = NULL;
+        }
+        if (val) {
+          free(val);
+          val = NULL;
+        }
+      }
+      _defaults_rc_goto_eol(f);
     }
   }  
   
@@ -63,17 +91,53 @@ void _defaults_rc_skip_spaces(FILE *stream) {
   }
 }
 
-int _defaults_rc_read_line(FILE *stream) {
+void _defaults_rc_goto_eol(FILE *stream) {
   int tok;
-  unsigned char *key_buf;
-  unsigned char *val_buf;
+  do {
+    tok = fgetc(stream);
+  } while (!feof(stream) && tok != '\n');
+}
+
+/** Reads a single line of the rc file and returns a key/value pair
+ *  if appropriate. If a line contains only whitespaces type is set
+ *  to _DEFAULTS_RC_LINE_EMPTY, if it starts (after possible whitespaces)
+ *  with a pound (#) it is a comment and thus type is set to
+ *  _DEFAULTS_RC_LINE_COMMENT.
+ *  If a correct key/value pair is found type is set to
+ *  _DEFAULTS_RC_LINE_KEYVALUE and key and val are set respectively.
+ *  Furthermore vstart and vend are set to the first token of the value
+ *  or the first token after the value.
+ *  If all went well the file pointer is set to the beginning of the line.
+ *  Use _defaults_rc_goto_eol() to eat the line.
+ *  @param stream The file to read from
+ *  @param key    Pointer to a string to hold the key. Memory will be 
+ *                allocated by the procedure. The caller should free 
+ *                this with free().
+ *  @param val    Pointer to a string to hold the value. Memory will be
+ *                allocated by the procedure. The caller should free
+ *                this with free().
+ *  @param type   The type of the line.
+ *  @param vstart Offset of the first character of the value.
+ *  @param vend   Offset of the first character after the value.
+ *  @return       Non-zero if an error occured.
+ */
+int _defaults_rc_read_line(FILE *stream, 
+                           unsigned char **key,
+                           unsigned char **val,
+                           int *type, long *vstart, long *vend) {
+  int tok;
   int key_len;
   int val_len;
   int i;
   long key_start;
   long val_start;
   long last_non_space;
-  long eol = -1;
+  long start_line;
+  
+  if (key) *key = NULL;
+  if (val) *val = NULL;
+  
+  start_line = ftell(stream);
 
   _defaults_rc_skip_spaces(stream);
   key_start = ftell(stream);
@@ -82,15 +146,18 @@ int _defaults_rc_read_line(FILE *stream) {
                          * so we try to read the token here                       */
 
   if (feof(stream)) {
+    if (type) *type = _DEFAULTS_RC_LINE_EMPTY;
+    fseek(stream, start_line, SEEK_CUR);
     return 0;
   }
-  if (tok == '#') { /* this is a comment: eat till end of line/file */
-    do {
-      tok = fgetc(stream);
-    } while (!feof(stream) && tok != '\n');
+  if (tok == '#') { /* this is a comment */
+    if (type) *type = _DEFAULTS_RC_LINE_COMMENT;
+    fseek(stream, start_line, SEEK_CUR);
     return 0;
   }
   else if (tok == '\n') {  /* already reached end of line */
+    if (type) *type = _DEFAULTS_RC_LINE_EMPTY;
+    fseek(stream, start_line, SEEK_CUR);
     return 0;
   }
   else {
@@ -127,46 +194,40 @@ int _defaults_rc_read_line(FILE *stream) {
         }
       }
       else {
-        eol = ftell(stream);
+/*        eol = ftell(stream);*/
         break;
       }
     }
     /* cut of trailing spaces */
     val_len = last_non_space;
     
-    key_buf = malloc(sizeof(unsigned char)*(key_len+1));
-    assert(key_buf);
-    
-    val_buf = malloc(sizeof(unsigned char)*(val_len+1));
-    assert(val_buf);
-    
-    /* goto beginning of key */
-    fseek(stream, key_start, SEEK_SET);
-    for (i = 0; i < key_len; i++) {
-      key_buf[i] = (unsigned char)fgetc(stream);
-    }
-    key_buf[key_len] = '\0';
-    
-    /* goto beginning of value */
-    fseek(stream, val_start, SEEK_SET);
-    for (i = 0; i < val_len; i++) {
-      val_buf[i] = (unsigned char)fgetc(stream);
-    }
-    val_buf[val_len] = '\0';
-    
-    /* find end of line*/
-    if (eol == -1) {
-      /* no eol, was eof */
-      fseek(stream, 1L, SEEK_END);
-    }
-    else {
-      fseek(stream, eol, SEEK_SET);
+    if (key) {
+      *key = malloc(sizeof(unsigned char*)*(key_len+1));
+      assert(*key);
+      /* goto beginning of key */
+      fseek(stream, key_start, SEEK_SET);
+      for (i = 0; i < key_len; i++) {
+        (*key)[i] = (unsigned char)fgetc(stream);
+      }
+      (*key)[key_len] = '\0';
     }
     
-    /* insert to defaults */
-    defaults_add(key_buf, val_buf);
-    free(key_buf);
-    free(val_buf);
+    if (val) {
+      *val = malloc(sizeof(unsigned char*)*(val_len+1));
+      assert(*val);
+      /* goto beginning of value */
+      fseek(stream, val_start, SEEK_SET);
+      for (i = 0; i < val_len; i++) {
+        (*val)[i] = (unsigned char)fgetc(stream);
+      }
+      (*val)[val_len] = '\0';
+    }
+    
+    if (vstart) *vstart = val_start;
+    if (vend) *vend = val_start+val_len;
+    if (type) *type = _DEFAULTS_RC_LINE_KEYVALUE;
+    
+    fseek(stream, start_line, SEEK_CUR);
     return 0;
   }
 }
