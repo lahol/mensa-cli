@@ -55,13 +55,21 @@ int cmd_show(int argc, char **argv) {
   mensaDate date;
   struct tm show_tm;
   time_t timestamp;
+  int max_width;
+  DefaultsError derr;
   int term_width = mensa_output_get_term_width();
   if (term_width == -1) term_width = 80;
-  /*i = 2;*/
-   /*try every command for time */
-/*  while (!arg_time && i < argc) {
-    arg_time = cmd_parse_time(argv[i]);
-  }*/
+
+  /* if we have a really wide terminal use specified block width */  
+  derr = defaults_get_int("show.max-width", &max_width);
+  if (derr != DEFAULTS_ERROR_OK) {
+    fprintf(stderr, "Config mismatch: show.max-width.\n");
+  }
+  else {
+    if (max_width > 0 && max_width < term_width) {
+      term_width = max_width;
+    }
+  }
 
   defaults_get("show.header", header, 256);
   

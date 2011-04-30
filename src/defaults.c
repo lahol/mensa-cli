@@ -147,17 +147,17 @@ int _defaults_rc_read_line(FILE *stream,
 
   if (feof(stream)) {
     if (type) *type = _DEFAULTS_RC_LINE_EMPTY;
-    fseek(stream, start_line, SEEK_CUR);
+    fseek(stream, start_line, SEEK_SET);
     return 0;
   }
   if (tok == '#') { /* this is a comment */
     if (type) *type = _DEFAULTS_RC_LINE_COMMENT;
-    fseek(stream, start_line, SEEK_CUR);
+    fseek(stream, start_line, SEEK_SET);
     return 0;
   }
   else if (tok == '\n') {  /* already reached end of line */
     if (type) *type = _DEFAULTS_RC_LINE_EMPTY;
-    fseek(stream, start_line, SEEK_CUR);
+    fseek(stream, start_line, SEEK_SET);
     return 0;
   }
   else {
@@ -227,7 +227,7 @@ int _defaults_rc_read_line(FILE *stream,
     if (vend) *vend = val_start+val_len;
     if (type) *type = _DEFAULTS_RC_LINE_KEYVALUE;
     
-    fseek(stream, start_line, SEEK_CUR);
+    fseek(stream, start_line, SEEK_SET);
     return 0;
   }
 }
