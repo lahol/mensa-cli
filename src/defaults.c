@@ -251,20 +251,86 @@ void defaults_free(void) {
   }
 }
 
-void defaults_get(unsigned char *key, unsigned char *value, int len) {
+DefaultsError defaults_get(unsigned char *key, unsigned char *value, int len) {
   DefaultsList *tmp = _defaults_get_key(key);
   if (value) {
     if (!tmp) {
       value[0] = '\0';
+      return DEFAULTS_ERROR_NOTFOUND;
     }
     else {
       if (tmp->value) {
         strncpy(value, tmp->value, len-1);
+        if (strlen(tmp->value) > len-1) {
+          return DEFAULTS_ERROR_NOTENOUGHSPACE;
+        }
+        else {
+          return DEFAULTS_ERROR_OK;
+        }
       }
       else {
         value[0] = '\0';
+        return DEFAULTS_ERROR_OK;
       }
     }
+  }
+  if (!tmp) {
+    return DEFAULTS_ERROR_NOTFOUND;
+  }
+  else {
+    return DEFAULTS_ERROR_OK;
+  }
+}
+
+DefaultsError defaults_get_int(unsigned char *key, int *value) {
+  DefaultsList *tmp = _defaults_get_key(key);
+  int i;
+  if (!tmp) {
+    return DEFAULTS_ERROR_NOTFOUND;
+  }
+  if (tmp->value) {
+    for (i = 0; tmp->value[i] != '\0'; i++) {
+      if (!isdigit(tmp->value[i])) {
+        return DEFAULTS_ERROR_TYPE_MISMATCH;
+      }
+    }
+    if (value) *value = atoi(tmp->value);
+    return DEFAULTS_ERROR_OK;
+  }
+  else {
+    if (value) *value = 0;
+    return DEFAULTS_ERROR_OK;
+  }
+}
+
+DefaultsError defaults_get_boolean(unsigned char *key, int *value) {
+  DefaultsList *tmp = _defaults_get_key(key);
+  int v;
+  if (!tmp) {
+    return DEFAULTS_ERROR_NOTFOUND;
+  }
+  if (tmp->value) {
+    if (!strcasecmp(tmp->value, "yes") ||
+        !strcasecmp(tmp->value, "y") ||
+        !strcmp(tmp->value, "1") ||
+        !strcmp(tmp->value, "+")) {
+      v = 1;
+    }
+    else if (!strcasecmp(tmp->value, "no") ||
+             !strcasecmp(tmp->value, "n") ||
+             !strcmp(tmp->value, "0") ||
+             !strcmp(tmp->value, "-")) {
+      v = 0;
+    }
+    else {
+      return DEFAULTS_ERROR_TYPE_MISMATCH;
+    }
+    if (value) *value = v;
+    return DEFAULTS_ERROR_OK;
+  }
+  else {
+    if (value) *value = 0;
+    return DEFAULTS_ERROR_OK;
   }
 }
 
