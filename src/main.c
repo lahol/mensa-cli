@@ -21,6 +21,8 @@ int parse_cmdline(int argc, char **argv);
 
 int file_exists(const unsigned char *filename);
 
+char * _get_rcpath(void);
+
 int cmd_help(int argc, char **argv) {
   if (argc <= 2) {
     printf("Usage: %s [cmd [args]]\n", argv[0]);
@@ -51,6 +53,7 @@ int cmd_show(int argc, char **argv) {
   unsigned char type_string[256];
   unsigned char header[256];
   unsigned char format_header[512];
+  unsigned char date_name[64];
   int type_str_len = 16;
   mensaDate date;
   struct tm show_tm;
@@ -83,7 +86,8 @@ int cmd_show(int argc, char **argv) {
     res = mensa_parse_time(argv[2], &date);
   }
   else {
-    res = mensa_parse_time(NULL, &date);
+    defaults_get("show.date", date_name, 64);
+    res = mensa_parse_time(date_name, &date);
   }
   
   if (res) {
@@ -111,7 +115,7 @@ int cmd_show(int argc, char **argv) {
       mensa_output_block(stdout, format_header, term_width, 0, 1);
     }
   }
-
+  
   if (group->meal_count > 0) {
     for (i = 0; i < group->meal_count; i++) {
       if (group->meals[i].type) {
@@ -137,14 +141,50 @@ int cmd_show(int argc, char **argv) {
 
 int cmd_config(int argc, char **argv) {
   printf("Config\n");
+  char *buffer = NULL;
+  char *rcpath;
+  int start;
+  int i;
+  int is_setting = 0;
+  /* ignore argv[0] */
+  for (i = 1; i < argc; i++) {
+    buffer = strdup(argv[i]);
+    is_setting = 0;
+    if (buffer) {
+      start = 0;
+      while (buffer[start] != '\0') {
+        if (buffer[start] == '=') {
+          is_setting = 1;
+          buffer[start] = '\0';
+          start++;
+          break;
+        }
+        start++;
+      }
+      if (start > 0 && is_setting) {
+        defaults_update(buffer, &buffer[start]);
+      }
+      free(buffer);
+    }
+  }
+
+  rcpath = _get_rcpath();
+
+  if (defaults_write(rcpath) != 0) {
+    fprintf(stderr, "Error writing config.\n");
+  }
+  else {
+    fprintf(stdout, "Written configuration to `%s'.\n", rcpath);
+  }
+  if (rcpath) {
+    free(rcpath);
+  }
   return 0;
 }
 
 int main(int argc, char **argv) {
 /*  parse_cmdline(argc, argv);*/
-  char *rcpath;
-  char *home;
-  int home_len;
+  char *rcpath = NULL;
   setlocale(LC_ALL, "");
   
   defaults_add("cmd.default", "show");
@@ -154,34 +194,14 @@ int main(int argc, char **argv) {
   defaults_add("show.header", "Offers for %A, %x");
   defaults_add("show.max-width", "80");
   
-  home = getenv("HOME");
-  if (home) {
-    home_len = strlen(home);
-  }
-  else {
-    home_len = 0;
-  }
-  rcpath = malloc(sizeof(char)*(home_len+10));
-  if (home) {
-    strcpy(rcpath, home);
-  }
-  else {
-    rcpath[0] = '\0';
-  }
-  
-  /* ensure that last token is no /, we add that later */
-  if (home_len > 0) {
-    if (rcpath[home_len-1] == '/') {
-      rcpath[home_len-1] = '\0';
-    }
-  }
-  
-  strcat(rcpath, "/");
-  strcat(rcpath, ".mensarc");
+  rcpath = _get_rcpath();
   
   if (file_exists(rcpath)) {
     if (defaults_read(rcpath) != 0) {
       defaults_free();
+      if (rcpath) {
+        free(rcpath);
+      }
       return 1;
     }
   }
@@ -193,6 +213,10 @@ int main(int argc, char **argv) {
   
   command_call(argc, argv);
   
+  if (rcpath) {
+    free(rcpath);
+  }
+
   defaults_free();
   
   return 0;
@@ -240,4 +264,36 @@ int parse_cmdline(int argc, char **argv) {
 int file_exists(const unsigned char *filename) {
   struct stat f;
   return stat(filename, &f) == 0 ? 1 : 0;
+}
+
+char * _get_rcpath(void) {
+  char *home;
+  char *rcpath;
+  int home_len;
+  home = getenv("HOME");
+  if (home) {
+    home_len = strlen(home);
+  }
+  else {
+    home_len = 0;
+  }
+  rcpath = malloc(sizeof(char)*(home_len+10));
+  if (home) {
+    strcpy(rcpath, home);
+  }
+  else {
+    rcpath[0] = '\0';
+  }
+  
+  /* ensure that last token is no /, we add that later */
+  if (home_len > 0) {
+    if (rcpath[home_len-1] == '/') {
+      rcpath[home_len-1] = '\0';
+    }
+  }
+  
+  strcat(rcpath, "/");
+  strcat(rcpath, ".mensarc");
+  
+  return rcpath;
 }

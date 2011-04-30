@@ -85,8 +85,23 @@ void _defaults_rc_skip_spaces(FILE *stream) {
     if (feof(stream)) {
       return;
     }
+    
     if (tok != ' ' && tok != '\t') {
-      fseek(stream, -1L, SEEK_CUR); /*ungetc(tok, stream);*/
+      /* dirty hack for tmp file */
+      if (tok == 0xff) {
+        tok = fgetc(stream);
+        if (!feof(stream)) {
+          fprintf(stderr, "!feof\n");
+          fseek(stream, -2L, SEEK_CUR);
+          return;
+        }
+        else {
+          return;
+        }
+      }
+      else {
+        fseek(stream, -1L, SEEK_CUR); /* ungetc(tok, stream);*/
+      }
       return;
     }
   }
@@ -104,6 +119,19 @@ void _defaults_rc_copy_line(FILE *src, FILE *dst) {
   if (!src || !dst) return;
   while (1) {
     tok = fgetc(src);
+    if (feof(src)) {
+      return;
+    }
+    else if (tok == 0xff) {
+      tok = fgetc(src);
+      if (feof(src)) {
+        return;
+      }
+      else {
+        fputc(0xff, dst);
+        fputc(tok, dst);
+      }
+    }
     fputc(tok, dst);
     if (tok == '\n') {
       return;
@@ -157,7 +185,7 @@ int _defaults_rc_read_line(FILE *stream,
 
   tok = fgetc(stream);  /* if we reach eof with seek cur, eof-flag is not set yet *
                          * so we try to read the token here                       */
-
+                         
   if (feof(stream)) {
     if (type) *type = _DEFAULTS_RC_LINE_EMPTY;
     fseek(stream, start_line, SEEK_SET);
@@ -255,6 +283,8 @@ int defaults_write(unsigned char *filename) {
   unsigned char *key;
   int ltype;
   int first;
+  int eof = EOF;
+  int res;
   
   /* no filename specified */
   if (!filename) {
@@ -277,6 +307,7 @@ int defaults_write(unsigned char *filename) {
     while (!feof(cfgfile)) {
       fputc(fgetc(cfgfile), tmp);
     }
+    
     rewind(tmp);
     fclose(cfgfile);
   }
@@ -288,6 +319,9 @@ int defaults_write(unsigned char *filename) {
                 filename);
         fclose(tmp);
         return 1;
+      }
+      else {
+        _defaults_rc_goto_eol(tmp);
       }
     }
   }
@@ -331,6 +365,9 @@ int defaults_write(unsigned char *filename) {
               /* set flag to written */
               setting->flags |= DEFAULTS_LIST_FLAG_WRITTEN;
             }
+            else { /* if not modified write this as it is */
+              _defaults_rc_copy_line(tmp, cfgfile);
+            }
           }
         }
       }
@@ -345,7 +382,7 @@ int defaults_write(unsigned char *filename) {
   first = 1;
   while (setting) {
     if ((setting->flags & DEFAULTS_LIST_FLAG_MODIFIED) &&
-        (setting->flags & DEFAULTS_LIST_FLAG_WRITTEN)) {
+        !(setting->flags & DEFAULTS_LIST_FLAG_WRITTEN)) {
       if (first) {
         fputc('\n', cfgfile);
         first = 0;
