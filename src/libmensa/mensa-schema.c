@@ -349,7 +349,7 @@ void mensa_schema_get_description(mensaSchema *schema, unsigned char **desc) {
   *desc = NULL;
   if (schema) {
     if (schema->schemaDesc) {
-      desc = strdup(schema->schemaDesc);
+      *desc = strdup(schema->schemaDesc);
     }
   }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <mensaschema>
   <name>tu-chemnitz.de-fnor-rh</name>
+  <description>TU Chemnitz, Mensa Reichenhainer Straße (fnor)</description>
   <source id="1" format="xml"
   flags="1"
   file="http://www-user.tu-chemnitz.de/~fnor/mensa/webservice_xml_2.php?mensa=rh&amp;jahr=%Y&amp;monat=%m&amp;tag=%d" />

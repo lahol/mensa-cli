@@ -28,6 +28,9 @@ int cmd_show(int argc, char **argv) {
   unsigned char *schema_path = NULL;
   char *schema_name = NULL;
   unsigned char *default_schema = NULL;
+  unsigned char *schema_desc = NULL;
+  unsigned char *schema_desc_key = NULL;
+  int show_desc;
   int type_str_len = 16;
   mensaDate date;
   struct tm show_tm;
@@ -53,6 +56,28 @@ int cmd_show(int argc, char **argv) {
     }
   }
   
+  if (defaults_get_boolean("show.description", &show_desc) != DEFAULTS_ERROR_OK) {
+    show_desc = 1;
+  }
+  
+  if (arg_date) {
+    res = mensa_parse_time(arg_date, &date);
+  }
+  else {
+    defaults_get("show.date", &date_name);
+    res = mensa_parse_time(date_name, &date);
+    if (date_name) {
+      free(date_name);
+    }
+  }
+  
+  if (res) {
+    fprintf(stderr, "Could not parse date.\n");
+    return 1;
+  }
+  
+  mensa_translate_date(&date);
+
   if (arg_schema) {
     if (arg_schema[0] != '\0') {
       schema_name = malloc(sizeof(unsigned char)*(strlen(arg_schema)+8));
@@ -81,11 +106,13 @@ int cmd_show(int argc, char **argv) {
       free(schema_path);
       if (!schema) {
         fprintf(stderr, "Error reading schema.\n");
+        free(schema_name);
         return 1;
       }
     }
     else {
       fprintf(stderr, "No schema path specified.\n");
+      free(schema_name);
       return 1;
     }
   }
@@ -93,24 +120,19 @@ int cmd_show(int argc, char **argv) {
     fprintf(stderr, "No schema specified.\n");
     return 1;
   }
-    
-  if (arg_date) {
-    res = mensa_parse_time(arg_date, &date);
-  }
-  else {
-    defaults_get("show.date", &date_name);
-    res = mensa_parse_time(date_name, &date);
-    if (date_name) {
-      free(date_name);
+  
+  if (show_desc) {
+    schema_desc_key = malloc(sizeof(unsigned char)*(strlen(schema_name)+13));
+    strcpy(schema_desc_key, schema_name);
+    strcat(schema_desc_key, ".description");
+    derr = defaults_get(schema_desc_key, &schema_desc);
+    if (derr != DEFAULTS_ERROR_OK) {
+      mensa_schema_get_description(schema, &schema_desc);
     }
+    free(schema_desc_key);
   }
-  
-  if (res) {
-    fprintf(stderr, "Could not parse date.\n");
-    return 1;
-  }
-  
-  mensa_translate_date(&date);
+  free(schema_name);
+    
   
   MensaMealGroup *group = mensa_get_meals(schema, &date);
   if (!group) {
@@ -120,7 +142,7 @@ int cmd_show(int argc, char **argv) {
   }
   
   defaults_get("show.header", &header);
-  if (header) {
+  if (header && header[0] != '\0') {
     show_tm.tm_mday = date.day;
     show_tm.tm_mon = date.month-1;
     show_tm.tm_year = date.year-1900;
@@ -131,6 +153,11 @@ int cmd_show(int argc, char **argv) {
       mensa_output_block(stdout, format_header, term_width, 0, 1);
     }
     free(header);
+  }
+  
+  if (show_desc && schema_desc && schema_desc[0] != 0) {
+    mensa_output_block(stdout, schema_desc, term_width, 0, 1);
+    free(schema_desc);
   }
   
   if (group->meal_count > 0) {

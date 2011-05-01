@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <mensaschema>
   <name>tu-chemnitz.de-strana</name>
+  <description>TU Chemnitz, Mensa Straße der Nationen</description>
   <source id="1" format="html"
   flags="0"
   file="http://www.tu-chemnitz.de/stuwe/speiseplan_public/web/web_StraNa.php" />

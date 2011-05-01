@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <mensaschema>
   <name>tu-chemnitz.de-fnor-strana</name>
+  <description>TU Chemnitz, Mensa Straße der Nationen (fnor)</description>
   <source id="1" format="xml"
   flags="1"
   file="http://www-user.tu-chemnitz.de/~fnor/mensa/webservice_xml_2.php?mensa=strana&amp;jahr=%Y&amp;monat=%m&amp;tag=%d" />
