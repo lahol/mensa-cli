@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <assert.h>
 
 #include "utils.h"
 
@@ -44,3 +45,12 @@ char * utils_get_rcpath(void) {
   
   return rcpath;
 }
+
+UtilsList *utils_list_prepend(UtilsList *list, void *data) {
+  UtilsList *ins = malloc(sizeof(UtilsList));
+  assert(ins);
+  ins->next = list;
+  ins->data = data;
+  return ins;
+}
+

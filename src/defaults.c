@@ -5,7 +5,7 @@
 #include <assert.h>
 
 #include "defaults.h"
-#include "libmensa/mensa-helpers.h"
+#include "utils.h"
 
 #define DEFAULTS_LIST_FLAG_NONE          0     /**< no flags */
 #define DEFAULTS_LIST_FLAG_MODIFIED      1<<0  /**< was modified by user (command) */
@@ -492,8 +492,8 @@ DefaultsError defaults_get_boolean(unsigned char *key, int *value) {
  *               defaults_enum_result_free().
  */
 void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result) {
-  mensaList *res_list = NULL;
-  mensaList *res_next = NULL;
+  UtilsList *res_list = NULL;
+  UtilsList *res_next = NULL;
   DefaultsList *tmp = NULL;
   int prefix_len;
   int i;
@@ -510,7 +510,7 @@ void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result) {
     while (tmp) {
       if (tmp->key) {
         if (strncmp(prefix, tmp->key, prefix_len) == 0) {
-          res_list = mensa_list_prepend(res_list, (void*)tmp);
+          res_list = utils_list_prepend(res_list, (void*)tmp);
           result->numResults++;
         }
       }
@@ -520,7 +520,7 @@ void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result) {
   else { /* no prefix -> get all settings*/
     tmp = _defaults_list;
     while (tmp) {
-      res_list = mensa_list_prepend(res_list, (void*)tmp);
+      res_list = utils_list_prepend(res_list, (void*)tmp);
       result->numResults++;
       tmp = tmp->next;
     }
