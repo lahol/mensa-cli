@@ -8,6 +8,12 @@ typedef enum {
   DEFAULTS_ERROR_NOTENOUGHSPACE,
 } DefaultsError;
 
+typedef struct _DefaultsEnumResult {
+  int numResults;
+  unsigned char **keys;
+  unsigned char **values;
+} DefaultsEnumResult;
+
 int defaults_read(unsigned char *filename);
 int defaults_write(unsigned char *filename);
 void defaults_free(void);
@@ -15,6 +21,9 @@ void defaults_free(void);
 DefaultsError defaults_get(unsigned char *key, unsigned char **value);
 DefaultsError defaults_get_int(unsigned char *key, int *value);
 DefaultsError defaults_get_boolean(unsigned char *key, int *value);
+
+void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result);
+void defaults_enum_result_free(DefaultsEnumResult *result);
 
 void defaults_add(unsigned char *key, unsigned char *value);
 void defaults_update(unsigned char *key, unsigned char *value);

@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include "defaults.h"
+#include "libmensa/mensa-helpers.h"
 
 #define DEFAULTS_LIST_FLAG_NONE          0     /**< no flags */
 #define DEFAULTS_LIST_FLAG_MODIFIED      1<<0  /**< was modified by user (command) */
@@ -495,6 +496,99 @@ DefaultsError defaults_get_boolean(unsigned char *key, int *value) {
   else {
     if (value) *value = 0;
     return DEFAULTS_ERROR_OK;
+  }
+}
+
+/** Enumerate default settings with the specified prefix and store them
+ *  in result. If prefix is NULL return all.
+ *  @param[in] prefix Prefix of the setting or NULL
+ *  @result[out] Pointer to the result struct. Should be freed with
+ *               defaults_enum_result_free().
+ */
+void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result) {
+  mensaList *res_list = NULL;
+  mensaList *res_next = NULL;
+  DefaultsList *tmp = NULL;
+  int prefix_len;
+  int i;
+  if (!result) {
+    return;
+  }
+  
+  result->numResults = 0;
+  result->keys = NULL;
+  result->values = NULL;
+  
+  if (prefix && (prefix_len = strlen(prefix)) > 0) {
+    tmp = _defaults_list;
+    while (tmp) {
+      if (tmp->key) {
+        if (strncmp(prefix, tmp->key, prefix_len) == 0) {
+          res_list = mensa_list_prepend(res_list, (void*)tmp);
+          result->numResults++;
+        }
+      }
+      tmp = tmp->next;
+    }
+  }
+  else { /* no prefix -> get all settings*/
+    tmp = _defaults_list;
+    while (tmp) {
+      res_list = mensa_list_prepend(res_list, (void*)tmp);
+      result->numResults++;
+      tmp = tmp->next;
+    }
+  }
+    
+  result->keys = malloc(sizeof(unsigned char*)*result->numResults);
+  assert(result->keys);
+  memset(result->keys, 0, sizeof(unsigned char*)*result->numResults);
+
+  result->values = malloc(sizeof(unsigned char*)*result->numResults);
+  assert(result->values);
+  memset(result->values, 0, sizeof(unsigned char*)*result->numResults);
+
+/*  for (i = result->numResults-1; i >= 0 && res_list; i--, res_list = res_next) {*/
+  /* defaults list is also in reverse order */
+  for (i = 0; i < result->numResults && res_list; i++, res_list = res_next) {
+    res_next = res_list->next;  
+    tmp = ((DefaultsList*)res_list->data);
+    free(res_list);
+    if (tmp) {
+      if (tmp->key) {
+        result->keys[i] = strdup(tmp->key);
+        assert(result->keys[i]);
+      }
+      if (tmp->value) {
+        result->values[i] = strdup(tmp->value);
+        assert(result->values[i]);
+      }
+    }
+  }
+}
+
+void defaults_enum_result_free(DefaultsEnumResult *result) {
+  int i;
+  if (result) {
+    if (result->keys) {
+      for (i = 0; i < result->numResults; i++) {
+        if (result->keys[i]) {
+          free(result->keys[i]);
+        }
+      }
+      free(result->keys);
+    }
+    if (result->values) {
+      for (i = 0; i < result->numResults; i++) {
+        if (result->values[i]) {
+          free(result->values[i]);
+        }
+      }
+      free(result->values);
+    }
+    result->numResults = 0;
+    result->keys = NULL;
+    result->values = NULL;
   }
 }
 
