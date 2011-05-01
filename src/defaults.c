@@ -362,6 +362,7 @@ int defaults_write(unsigned char *filename) {
         _defaults_rc_copy_line(tmp, cfgfile);
       }
     }
+    fclose(tmp);
   }
   
   /* write all modified settings that have not been written to cfgfile */
@@ -386,7 +387,6 @@ int defaults_write(unsigned char *filename) {
     setting = setting->next;
   }
   
-  fclose(tmp);
   fclose(cfgfile);
   return 0;
 }
