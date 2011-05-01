@@ -16,6 +16,9 @@ int cmd_config_set(char *arg) {
   int start;
   char *buffer = NULL;
   int is_setting = 0;
+  if (!arg) {
+    return 1;
+  }
   buffer = strdup(arg);
   if (buffer) {
     start = 0;
