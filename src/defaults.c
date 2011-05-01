@@ -88,21 +88,7 @@ void _defaults_rc_skip_spaces(FILE *stream) {
     }
     
     if (tok != ' ' && tok != '\t') {
-      /* dirty hack for tmp file */
-      if (tok == 0xff) {
-        tok = fgetc(stream);
-        if (!feof(stream)) {
-          fprintf(stderr, "!feof\n");
-          fseek(stream, -2L, SEEK_CUR);
-          return;
-        }
-        else {
-          return;
-        }
-      }
-      else {
-        fseek(stream, -1L, SEEK_CUR); /* ungetc(tok, stream);*/
-      }
+      fseek(stream, -1L, SEEK_CUR); /* ungetc(tok, stream);*/
       return;
     }
   }
@@ -123,17 +109,9 @@ void _defaults_rc_copy_line(FILE *src, FILE *dst) {
     if (feof(src)) {
       return;
     }
-    else if (tok == 0xff) {
-      tok = fgetc(src);
-      if (feof(src)) {
-        return;
-      }
-      else {
-        fputc(0xff, dst);
-        fputc(tok, dst);
-      }
+    else {
+      fputc(tok, dst);
     }
-    fputc(tok, dst);
     if (tok == '\n') {
       return;
     }
@@ -226,20 +204,20 @@ int _defaults_rc_read_line(FILE *stream,
     
     val_start = ftell(stream);
     val_len = 0;
-    last_non_space = val_start;
+    last_non_space = 0;
     while (!feof(stream)) {
       tok = fgetc(stream);
-      if (tok != '\n') {
+      if (tok != '\n' && !feof(stream)) {
         val_len++;
         if (tok != ' ' && tok != '\t') {
           last_non_space = val_len;
         }
       }
       else {
-/*        eol = ftell(stream);*/
         break;
       }
     }
+    
     /* cut of trailing spaces */
     val_len = last_non_space;
     
@@ -286,6 +264,7 @@ int defaults_write(unsigned char *filename) {
   int first;
   int eof = EOF;
   int res;
+  int tok;  
   
   /* no filename specified */
   if (!filename) {
@@ -306,7 +285,10 @@ int defaults_write(unsigned char *filename) {
       return 1;
     }
     while (!feof(cfgfile)) {
-      fputc(fgetc(cfgfile), tmp);
+      tok = fgetc(cfgfile);
+      if (tok != EOF) {
+        fputc(tok, tmp);
+      }
     }
     
     rewind(tmp);
@@ -355,14 +337,18 @@ int defaults_write(unsigned char *filename) {
               for (i = start; i < vstart; i++) {
                 fputc(fgetc(tmp), cfgfile);
               }
+              
               /* write value */
-              if (setting->value) {
+              if (setting->value && setting->value[0] != '\0') {
                 fprintf(cfgfile, "%s", setting->value);
               }
+              
               /* jump to character after value */
               fseek(tmp, vend, SEEK_SET);
+
               /* write rest of line*/
               _defaults_rc_copy_line(tmp, cfgfile);
+
               /* set flag to written */
               setting->flags |= DEFAULTS_LIST_FLAG_WRITTEN;
             }
@@ -390,7 +376,7 @@ int defaults_write(unsigned char *filename) {
       }
       if (setting->key) {
         fprintf(cfgfile, "%s = ", setting->key);
-        if (setting->value) {
+        if (setting->value && setting->value[0] != '\0') {
           fprintf(cfgfile, "%s", setting->value);
         }
         fputc('\n', cfgfile);
