@@ -48,6 +48,7 @@ struct _mensaSchemaFoodDescription {
 
 struct _mensaSchema {
   char *schemaName;                     /**< identifier of the schema */
+  unsigned char *schemaDesc;            /**< description of the schema */
   struct _mensaSchemaSource *sources;   /**< sources of the schema */
   int nsources;                         /**< number of sources of the schema */
   struct _mensaSchemaSourceFood *foods;       /**< food descriptors of the schema */
@@ -105,8 +106,17 @@ mensaSchema * mensa_schema_read_from_file(const char *filename) {
         if (content) {
           if (!schema->schemaName) {
             schema->schemaName = strdup((char*)content);
-            xmlFree(content);
           }
+          xmlFree(content);
+        }
+      }
+      else if (!xmlStrcmp(cur->name, (const xmlChar*)"description")) {
+        content = xmlNodeGetContent(cur);
+        if (content) {
+          if (!schema->schemaDesc) {
+            schema->schemaDesc = strdup((char*)content);
+          }
+          xmlFree(content);
         }
       }
       else if (!xmlStrcmp(cur->name, (const xmlChar*)"source")) {
@@ -292,8 +302,55 @@ mensaSchema * mensa_schema_read_from_file(const char *filename) {
 }
 
 void mensa_schema_free(mensaSchema *schema) {
+  int i;
   if (schema) {
+    if (schema->schemaName) {
+      free(schema->schemaName);
+    }
+    if (schema->schemaDesc) {
+      free(schema->schemaDesc);
+    }
+    if (schema->sources) {
+      for (i = 0; i < schema->nsources; i++) {
+        if (schema->sources[i].source) {
+          free(schema->sources[i].source);
+        }
+      }
+      free(schema->sources);
+    }
+    if (schema->foods) {
+      for (i = 0; i < schema->nfoods; i++) {
+        if (schema->foods[i].path) {
+          free(schema->foods[i].path);
+        }
+        if (schema->foods[i].desc_path) {
+          free(schema->foods[i].desc_path);
+        }
+      }
+      free(schema->foods);
+    }
+    if (schema->fdescs) {
+      for (i = 0; i < schema->nfdescs; i++) {
+        if (schema->fdescs[i].identifier) {
+          free(schema->fdescs[i].identifier);
+        }
+        if (schema->fdescs[i].description) {
+          free(schema->fdescs[i].description);
+        }
+      }
+      free(schema->fdescs);
+    }
     free(schema);
+  }
+}
+
+void mensa_schema_get_description(mensaSchema *schema, unsigned char **desc) {
+  if (!desc) return;
+  *desc = NULL;
+  if (schema) {
+    if (schema->schemaDesc) {
+      desc = strdup(schema->schemaDesc);
+    }
   }
 }
 
