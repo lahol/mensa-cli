@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
   
   defaults_add("cmd.default", "show");
   defaults_add("show.date", "today");
+  defaults_add("show.description", "yes");
   defaults_add("show.schema", "");
   defaults_add("show.clear-cache", "no");
   defaults_add("show.header", "Offers for %A, %x");

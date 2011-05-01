@@ -162,11 +162,12 @@ int cmd_show(int argc, char **argv) {
 int _cmd_show_parse_cmdline(int argc, char **argv, 
                             char **date, 
                             char **schema) {
-  int i, j;
+  int i, j, k;
   DefaultsEnumResult schemata;
   char *remainder;
   struct tm arg_time;
   int nused = 1;
+  int ndots;
   int *used = malloc(sizeof(int)*argc);
   assert(used);
   memset(used, 0, sizeof(int)*argc);
@@ -213,14 +214,21 @@ int _cmd_show_parse_cmdline(int argc, char **argv,
         }
         else {
           for (j = 0; j < schemata.numResults; j++) {
+            /* first check if this is a valid schema name, i.e. contains max 1 . */
+            ndots = 0;
+            for (k = 0; argv[i][k] != '\0'; k++) {
+              if (argv[i][k] == '.') {
+                ndots++;
+              }
+            }
             /* check part after `schema.' */
-            if (!strcasecmp(&schemata.keys[j][7], argv[i])) {
+            if (ndots == 0 && !strcasecmp(&schemata.keys[j][7], argv[i])) {
               used[i] = 1;
               nused++;
               if (schema) *schema = argv[i];
               break;
             }
-            else if (!strcasecmp(schemata.keys[j], argv[i])) {
+            else if (ndots == 1 && !strcasecmp(schemata.keys[j], argv[i])) {
               /* full name specified */
               used[i] = 1;
               nused++;

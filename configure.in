@@ -8,6 +8,10 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
 
+# no need to reconfigure if not explicitly ./configure --enable-maintainer-mode
+# is run
+AM_MAINTAINER_MODE
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_LIBTOOL
