@@ -96,7 +96,7 @@ int mensa_translate_date(mensaDate *date) {
   
   daydiff = (int)(difftime(target_time, current_time)/86400);  /* seconds / 60 / 60 / 24 -> days*/
   
-  wk = (clt->tm_wday+daydiff)/7;
+  wk = ((clt->tm_wday ? clt->tm_wday : 7)+daydiff)/7;
   dy = (clt->tm_wday+daydiff)%7;
   if (dy == 0) wk--;
 

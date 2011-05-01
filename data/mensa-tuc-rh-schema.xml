@@ -5,8 +5,8 @@
   flags="0"
   file="http://www.tu-chemnitz.de/stuwe/speiseplan_public/web/web_RH.php" />
   <source id="2" format="html"
-  flags="0"
-  file="http://www.tu-chemnitz.de/stuwe/speiseplan_public/web/web_RH_nextweek.php"
+  flags="1"
+  file="http://www.tu-chemnitz.de/stuwe/speiseplan_public/web/web_RH_nextweek.php?week=%U&amp;year=%Y"
   />
   <fooddescription identifier="Hauptessen 1">Essen 1</fooddescription>
   <fooddescription identifier="Hauptessen 2">Essen 2</fooddescription>
