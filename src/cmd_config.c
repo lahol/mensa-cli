@@ -7,37 +7,46 @@
 #include "mensa-output.h"
 #include "utils.h"
 
-int cmd_config(int argc, char **argv) {
-  char *buffer = NULL;
-  char *rcpath;
+/** Check if the string is a setting of the form key=value
+ *  and update this value.
+ *  @param arg The string as we get it from the command line
+ *  @return 0 if it was a setting, 1 otherwise
+ */
+int cmd_config_set(char *arg) {
   int start;
-  int i;
+  char *buffer = NULL;
   int is_setting = 0;
+  buffer = strdup(arg);
+  if (buffer) {
+    start = 0;
+    while (buffer[start] != '\0') {
+      if (buffer[start] == '=') {
+        is_setting = 1;
+        buffer[start] = '\0';
+        start++;
+        break;
+      }
+      start++;
+    }
+    if (start > 0 && is_setting) {
+      defaults_update(buffer, &buffer[start]);
+    }
+    free(buffer);
+  }
+  return !is_setting;
+}
+
+int cmd_config(int argc, char **argv) {
+  char *rcpath;
+  int i;
   int nsettings = 0;
   int term_width;
   int len, max_len, block_width, newline_after_key, block_indent;
   DefaultsEnumResult enres;
   /* ignore argv[0] */
   for (i = 1; i < argc; i++) {
-    buffer = strdup(argv[i]);
-    is_setting = 0;
-    if (buffer) {
-      start = 0;
-      while (buffer[start] != '\0') {
-        if (buffer[start] == '=') {
-          is_setting = 1;
-          buffer[start] = '\0';
-          start++;
-          break;
-        }
-        start++;
-      }
-      if (start > 0 && is_setting) {
-        fprintf(stderr, "setting: \"%s\":\"%s\"\n", buffer, &buffer[start]);
-        defaults_update(buffer, &buffer[start]);
-        nsettings++;
-      }
-      free(buffer);
+    if (cmd_config_set(argv[i]) == 0) {
+      nsettings++;
     }
   }
   
