@@ -12,7 +12,7 @@ int defaults_read(unsigned char *filename);
 int defaults_write(unsigned char *filename);
 void defaults_free(void);
 
-DefaultsError defaults_get(unsigned char *key, unsigned char *value, int len);
+DefaultsError defaults_get(unsigned char *key, unsigned char **value);
 DefaultsError defaults_get_int(unsigned char *key, int *value);
 DefaultsError defaults_get_boolean(unsigned char *key, int *value);
 

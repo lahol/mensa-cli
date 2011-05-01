@@ -419,25 +419,21 @@ void defaults_free(void) {
   }
 }
 
-DefaultsError defaults_get(unsigned char *key, unsigned char *value, int len) {
+DefaultsError defaults_get(unsigned char *key, unsigned char **value) {
   DefaultsList *tmp = _defaults_get_key(key);
   if (value) {
     if (!tmp) {
-      value[0] = '\0';
+      *value = NULL;
       return DEFAULTS_ERROR_NOTFOUND;
     }
     else {
       if (tmp->value) {
-        strncpy(value, tmp->value, len-1);
-        if (strlen(tmp->value) > len-1) {
-          return DEFAULTS_ERROR_NOTENOUGHSPACE;
-        }
-        else {
-          return DEFAULTS_ERROR_OK;
-        }
+        *value = strdup(tmp->value);
+        assert(*value);
+        return DEFAULTS_ERROR_OK;
       }
       else {
-        value[0] = '\0';
+        *value = NULL;
         return DEFAULTS_ERROR_OK;
       }
     }

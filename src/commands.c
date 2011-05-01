@@ -49,11 +49,17 @@ CmdList* _command_exists(char *name) {
 }
 
 int command_call(int argc, char **argv) {
-  char cmd_name[32];
+  unsigned char *cmd_name;
   CmdList *cmd = NULL;
   if (argc == 1) {
-    defaults_get("cmd.default", cmd_name, 32);
-    cmd = _command_exists(cmd_name);
+    defaults_get("cmd.default", &cmd_name);
+    if (cmd_name) {
+      cmd = _command_exists(cmd_name);
+      free(cmd_name);
+    }
+    else {
+      fprintf(stderr, "No default command specified.\n");
+    }
   }
   else {
     cmd = _command_exists(argv[1]);

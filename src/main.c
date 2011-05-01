@@ -51,9 +51,9 @@ int cmd_show(int argc, char **argv) {
   int i;
   int res;
   unsigned char type_string[256];
-  unsigned char header[256];
+  unsigned char *header = NULL;
   unsigned char format_header[512];
-  unsigned char date_name[64];
+  unsigned char *date_name = NULL;
   int type_str_len = 16;
   mensaDate date;
   struct tm show_tm;
@@ -74,8 +74,6 @@ int cmd_show(int argc, char **argv) {
     }
   }
 
-  defaults_get("show.header", header, 256);
-  
   schema = mensa_schema_read_from_file("/home/lahol/Projekte/mensa/data/mensa-tuc-rh-fnor-schema.xml");
   if (!schema) {
     fprintf(stderr, "Error reading schema.\n");
@@ -86,8 +84,11 @@ int cmd_show(int argc, char **argv) {
     res = mensa_parse_time(argv[2], &date);
   }
   else {
-    defaults_get("show.date", date_name, 64);
+    defaults_get("show.date", &date_name);
     res = mensa_parse_time(date_name, &date);
+    if (date_name) {
+      free(date_name);
+    }
   }
   
   if (res) {
@@ -104,7 +105,8 @@ int cmd_show(int argc, char **argv) {
     return 1;
   }
   
-  if (header[0] != '\0') {
+  defaults_get("show.header", &header);
+  if (header) {
     show_tm.tm_mday = date.day;
     show_tm.tm_mon = date.month-1;
     show_tm.tm_year = date.year-1900;
@@ -114,6 +116,7 @@ int cmd_show(int argc, char **argv) {
     if (strftime(format_header, 512, header, &show_tm)) {
       mensa_output_block(stdout, format_header, term_width, 0, 1);
     }
+    free(header);
   }
   
   if (group->meal_count > 0) {
@@ -140,7 +143,6 @@ int cmd_show(int argc, char **argv) {
 }
 
 int cmd_config(int argc, char **argv) {
-  printf("Config\n");
   char *buffer = NULL;
   char *rcpath;
   int start;
