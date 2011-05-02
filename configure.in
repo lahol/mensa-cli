@@ -44,5 +44,6 @@ AC_CHECK_FUNCS([memset setlocale strcasecmp strdup])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/libmensa/Makefile
-                 data/Makefile])
+                 data/Makefile
+                 data/bash_completion.d/Makefile])
 AC_OUTPUT

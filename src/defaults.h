@@ -1,17 +1,27 @@
+/** @ingroup mensa-cli
+ *  @file
+ *  Header file for default settings and configuration.
+ */
 #ifndef __DEFAULTS_H__
 #define __DEFAULTS_H__
 
+/** @enum DefaultsError
+ *  Error codes for the defaults module
+ */
+/* @{ */
 typedef enum {
-  DEFAULTS_ERROR_OK = 0,
-  DEFAULTS_ERROR_TYPE_MISMATCH,
-  DEFAULTS_ERROR_NOTFOUND,
-  DEFAULTS_ERROR_NOTENOUGHSPACE,
+  DEFAULTS_ERROR_OK = 0,            /**< No errors occured. */
+  DEFAULTS_ERROR_TYPE_MISMATCH,     /**< String cannot be converted to 
+                                         desired type. */
+  DEFAULTS_ERROR_NOTFOUND,          /**< Did not find the specified key. */
 } DefaultsError;
+/* @} */
 
+/** Enumeration result. */
 typedef struct _DefaultsEnumResult {
-  int numResults;
-  unsigned char **keys;
-  unsigned char **values;
+  int numResults;           /**< The number of results. */
+  unsigned char **keys;     /**< An array of matching keys. */
+  unsigned char **values;   /**< An array of the associated values. */
 } DefaultsEnumResult;
 
 int defaults_read(unsigned char *filename);

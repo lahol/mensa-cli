@@ -1,3 +1,24 @@
+/** @mainpage
+ *  Mensa-CLI is a small program intended to show available meals of a
+ *  preferred cafeteria (mensa from Latin `table', common name for cafeterias
+ *  in German universities) in the terminal.
+ *
+ *  Provided that the information is available in some form of html/xml a
+ *  schema can be used to retrieve the information.
+ *
+ *  At least one schema file should be specified via schema.<name>=<path> and
+ *  activated via show.schema=<name>. This can be done in the file ~/.mensarc
+ *  Mensa-CLI also provides a shared library `libmensa' which is responsible
+ *  for all parsing.
+ * 
+ *  @version 0.1
+ *  @date 2011-05-01
+ *  First usable version.
+ *
+ *  @defgroup mensa-cli Command line interface for libmensa.
+ *  @file
+ *  The main file for the program.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -9,12 +30,6 @@
 #include "commands.h"
 #include "defaults.h"
 #include "cmd.h"
-/*#include "libmensa/mensa.h"
-#include "mensa-output.h"
-#define _XOPEN_SOURCE
-#include <time.h>*/
-
-int parse_cmdline(int argc, char **argv);
 
 int cmd_info(int argc, char **argv) {
   printf("Info\n");
@@ -22,7 +37,6 @@ int cmd_info(int argc, char **argv) {
 }
 
 int main(int argc, char **argv) {
-/*  parse_cmdline(argc, argv);*/
   char *rcpath = NULL;
   setlocale(LC_ALL, "");
   
@@ -59,45 +73,6 @@ int main(int argc, char **argv) {
 
   defaults_free();
   
-  return 0;
-}
-
-int parse_cmdline(int argc, char **argv) {
-  int c;
-  static int clear_cache_flag;
-  int option_index = 0;
-  static struct option long_options[] = {
-    { "clear-cache", no_argument, &clear_cache_flag, 1 },
-    { "date", optional_argument, 0, 'd' },
-    { 0, 0, 0, 0}
-  };
-  
-  while ((c = getopt_long(argc, argv, "d:c", 
-                          long_options, &option_index)) != -1) {
-    switch (c) {
-      case 0:
-        printf("option 0\n");
-        break;
-      case 'c':
-        printf("option c\n");
-        break;
-      case 'd':
-        printf("option d\n");
-        break;
-      case '?':
-        printf("unknown\n");
-        break;
-      default:
-        printf("default\n");
-    }
-  }
-  if (optind < argc) {
-    printf("non-option ARGV-elements: ");
-    while (optind < argc) {
-      printf("%s ", argv[optind++]);
-    }
-    putchar('\n');
-  }
   return 0;
 }
 

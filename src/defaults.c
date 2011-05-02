@@ -35,6 +35,10 @@ void _defaults_rc_skip_spaces(FILE *stream);
 void _defaults_rc_goto_eol(FILE *stream);
 void _defaults_rc_copy_line(FILE *src, FILE *dst);
 
+/** Read default settings from an rc-file.
+ *  @param[in] filename The file to read from.
+ *  @return 0 if the file could be read or 1 if an error occured.
+ */
 int defaults_read(unsigned char *filename) {
   FILE *f;
   int type;
@@ -79,6 +83,10 @@ int defaults_read(unsigned char *filename) {
   return 0;
 }
 
+/** Skip spaces and tabs from the current position of the stream.
+ *  @param[in] stream A pointer to a file structure, open to read.
+ *  @internal
+ */
 void _defaults_rc_skip_spaces(FILE *stream) {
   int tok;
   while (1) {
@@ -94,6 +102,10 @@ void _defaults_rc_skip_spaces(FILE *stream) {
   }
 }
 
+/** Read characters until the end of line/file is reached.
+ *  @param[in] stream A pointer to a file structure, open to read.
+ *  @internal
+ */
 void _defaults_rc_goto_eol(FILE *stream) {
   int tok;
   do {
@@ -101,6 +113,11 @@ void _defaults_rc_goto_eol(FILE *stream) {
   } while (!feof(stream) && tok != '\n');
 }
 
+/** Copy the (rest of the) line from src to dst.
+ *  @param[in] src A pointer to a file structure, open to read.
+ *  @param[in] dst A pointer to a file structure, open to write.
+ *  @internal
+ */
 void _defaults_rc_copy_line(FILE *src, FILE *dst) {
   int tok;
   if (!src || !dst) return;
@@ -140,6 +157,7 @@ void _defaults_rc_copy_line(FILE *src, FILE *dst) {
  *  @param vstart Offset of the first character of the value.
  *  @param vend   Offset of the first character after the value.
  *  @return       Non-zero if an error occured.
+ *  @internal
  */
 int _defaults_rc_read_line(FILE *stream, 
                            unsigned char **key,
@@ -252,6 +270,14 @@ int _defaults_rc_read_line(FILE *stream,
   }
 }
 
+/** Write the current defaults to the specified file. Only defaults
+ *  that were set with defaults_update() are written. If the file 
+ *  exists the content is left untouched and only the value of 
+ *  updated defaults is replaced.
+ *  @see defaults_update()
+ *  @param[in] filename The name of the file to write to.
+ *  @return 0 on success, 1 otherwise.
+ */ 
 int defaults_write(unsigned char *filename) {
   DefaultsList *setting = NULL;
   FILE *cfgfile = NULL;
@@ -391,6 +417,8 @@ int defaults_write(unsigned char *filename) {
   return 0;
 }
 
+/** Free all allocated memory for the defaults module.
+ */
 void defaults_free(void) {
   DefaultsList *tmp;
   while (_defaults_list) {
@@ -406,6 +434,12 @@ void defaults_free(void) {
   }
 }
 
+/** Get the string representation of a value assigned to a given key.
+ *  @param[in] key The key to get the value for.
+ *  @param[out] value Pointer to a pointer to hold the value if found. 
+ *                    Should be freed by the caller using free().
+ *  @return An error code.
+ */
 DefaultsError defaults_get(unsigned char *key, unsigned char **value) {
   DefaultsList *tmp = _defaults_get_key(key);
   if (value) {
@@ -433,6 +467,11 @@ DefaultsError defaults_get(unsigned char *key, unsigned char **value) {
   }
 }
 
+/** Get the integer value to a given key.
+ *  @param[in] key The key to get the value for.
+ *  @param[out] value A pointer to a variable to write the value to.
+ *  @return An error code.
+ */
 DefaultsError defaults_get_int(unsigned char *key, int *value) {
   DefaultsList *tmp = _defaults_get_key(key);
   int i;
@@ -454,6 +493,12 @@ DefaultsError defaults_get_int(unsigned char *key, int *value) {
   }
 }
 
+/** Get the boolean value to a given key. The strings yes, y, 1, + are
+ *  considered to be true, no, n, 0, - to be false.
+ *  @param[in] key The key to get the value for.
+ *  @param[out] value A pointer to a variable to write the value to.
+ *  @return An error code.
+ */
 DefaultsError defaults_get_boolean(unsigned char *key, int *value) {
   DefaultsList *tmp = _defaults_get_key(key);
   int v;
@@ -553,6 +598,9 @@ void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result) {
   }
 }
 
+/** Free all allocated memory for the result of defaults_enum().
+ *  @param[in] result A pointer to the result object to be freed.
+ */
 void defaults_enum_result_free(DefaultsEnumResult *result) {
   int i;
   if (result) {
@@ -578,6 +626,13 @@ void defaults_enum_result_free(DefaultsEnumResult *result) {
   }
 }
 
+/** Set a key/value pair. If the key exists the value is overwritten.
+ *  If it doesn't a new set is inserted.
+ *  @param[in] key The name of the key to set the value for.
+ *  @param[in] value The string representation of the value or NULL.
+ *  @return A pointer to the set modified or inserted.
+ *  @internal
+ */
 DefaultsList * _defaults_set(unsigned char *key, unsigned char *value) {
   DefaultsList *tmp;
   if (!key) return NULL;
@@ -604,10 +659,24 @@ DefaultsList * _defaults_set(unsigned char *key, unsigned char *value) {
   return tmp;
 }
 
+/** Set a key/value pair. If the key exists the value is overwritten.
+ *  If it doesn't a new set is inserted.
+ *  This setting only holds for the time the program is running. If
+ *  you want to write it to the rc-file with defaults_write()
+ *  use defaults_update() instead.
+ *  @param[in] key The name of the key to set the value for.
+ *  @param[in] value The string representation of the value or NULL.
+ *  @see defaults_update()
+ */
 void defaults_add(unsigned char *key, unsigned char *value) {
   _defaults_set(key, value);
 }
 
+/** Set a key/value pair. If the key exists the value is overwritten.
+ *  If it doesn't a new set is inserted. Also mark the setting as
+ *  modified so that a subsequent call to defaults_write() stores this
+ *  in the rc-file.
+ */
 void defaults_update(unsigned char *key, unsigned char *value) {
   DefaultsList *tmp = _defaults_set(key, value);
   if (tmp) {
@@ -615,6 +684,11 @@ void defaults_update(unsigned char *key, unsigned char *value) {
   }
 }
 
+/** Find a given key in the defaults list.
+ *  @param[in] key The name of the key.
+ *  @return Pointer to the existing one or NULL if the key was not found.
+ *  @internal
+ */
 DefaultsList * _defaults_get_key(unsigned char *key) {
   DefaultsList *tmp = _defaults_list;
   if (!key) return NULL;
