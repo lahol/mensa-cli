@@ -15,7 +15,7 @@
  *  @date 2011-05-01
  *  First usable version.
  *
- *  @defgroup mensa-cli Command line interface for libmensa.
+ *  @defgroup mensacli Command line interface for libmensa.
  *  @file
  *  The main file for the program.
  */

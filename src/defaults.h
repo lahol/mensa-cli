@@ -1,4 +1,5 @@
-/** @ingroup mensa-cli
+/** @defgroup defaults Default settings and configuration.
+ *  @ingroup mensacli
  *  @file
  *  Header file for default settings and configuration.
  */

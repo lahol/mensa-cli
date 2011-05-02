@@ -7,22 +7,40 @@
 #include "defaults.h"
 #include "utils.h"
 
+/** @name Default list flags.
+ *  @internal
+ */
+/* @{ */
 #define DEFAULTS_LIST_FLAG_NONE          0     /**< no flags */
 #define DEFAULTS_LIST_FLAG_MODIFIED      1<<0  /**< was modified by user (command) */
 #define DEFAULTS_LIST_FLAG_WRITTEN       1<<1  /**< has been written to rc file */
+/* @} */
 
-#define _DEFAULTS_RC_LINE_KEYVALUE       1
-#define _DEFAULTS_RC_LINE_EMPTY          2
-#define _DEFAULTS_RC_LINE_COMMENT        3
+/** @name Line types of rc file
+ *  @internal
+ */
+/* @{ */
+#define _DEFAULTS_RC_LINE_KEYVALUE       1     /**< Line is a key/value pair. */
+#define _DEFAULTS_RC_LINE_EMPTY          2     /**< An empty line, possibly whitespaces. */
+#define _DEFAULTS_RC_LINE_COMMENT        3     /**< Line contains a comment. */
+/* @} */
 
+/** Defaults list element.
+ *  @internal
+ */
+/* @{ */
 typedef struct _DefaultsList DefaultsList;
 struct _DefaultsList {
-  unsigned char *key;
-  unsigned char *value;
-  unsigned long flags;
-  DefaultsList *next;
+  unsigned char *key;                          /**< @brief Name of the key. */
+  unsigned char *value;                        /**< @brief The associated value. */
+  unsigned long flags;                         /**< @brief Flags of this pair. */
+  DefaultsList *next;                          /**< @brief Next element in list. */
 };
+/* @} */
 
+/** List of defaults. 
+ *  @internal
+ */
 DefaultsList *_defaults_list = NULL;
 
 DefaultsList * _defaults_set(unsigned char *key, unsigned char *value);
@@ -676,6 +694,8 @@ void defaults_add(unsigned char *key, unsigned char *value) {
  *  If it doesn't a new set is inserted. Also mark the setting as
  *  modified so that a subsequent call to defaults_write() stores this
  *  in the rc-file.
+ *  @param[in] key The name of the key to set the value for.
+ *  @param[in] value The string representation of the value or NULL.
  */
 void defaults_update(unsigned char *key, unsigned char *value) {
   DefaultsList *tmp = _defaults_set(key, value);
