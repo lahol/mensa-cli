@@ -1,3 +1,7 @@
+/** @file
+ *  @ingroup commands
+ *  Implementation of the help command.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +9,11 @@
 #include "mensa-output.h"
 #include "utils.h"
 
+/** Run the help command.
+ *  @param[in] argc The number of command line arguments.
+ *  @param[in] argv The command line arguments.
+ *  @return 0 on success.
+ */
 int cmd_help(int argc, char **argv) {
   if (argc <= 2) {
     printf("Usage: %s [cmd [args]]\n", argv[0]);

@@ -1,3 +1,8 @@
+/** @ingroup commands
+ *  @file
+ *  Header file for the implementation of the supported commands and
+ *  shared features.
+ */
 #ifndef __CMD_H__
 #define __CMD_H__
 

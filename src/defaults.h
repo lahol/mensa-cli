@@ -1,6 +1,7 @@
 /** @defgroup defaults Default settings and configuration.
  *  @ingroup mensacli
  *  @file
+ *  @ingroup defaults
  *  Header file for default settings and configuration.
  */
 #ifndef __DEFAULTS_H__

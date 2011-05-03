@@ -1,3 +1,9 @@
+/** @defgroup output Handle output to terminal.
+ *  @ingroup mensacli
+ *  @file
+ *  @ingroup output
+ *  Header file for output to terminal.
+ */
 #ifndef __MENSA_OUTPUT_H__
 #define __MENSA_OUTPUT_H__
 

@@ -17,6 +17,7 @@
  *
  *  @defgroup mensacli Command line interface for libmensa.
  *  @file
+ *  @ingroup mensacli
  *  The main file for the program.
  */
 #include <stdio.h>

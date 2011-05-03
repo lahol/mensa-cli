@@ -1,3 +1,7 @@
+/** @file
+ *  @ingroup defaults
+ *  Implementation of resource file and defaults handling.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>

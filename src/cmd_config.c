@@ -1,3 +1,7 @@
+/** @file
+ *  @ingroup commands
+ *  Implementation of the config command.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,6 +43,11 @@ int cmd_config_set(char *arg) {
   return !is_setting;
 }
 
+/** Run the config command.
+ *  @param[in] argc The number of command line arguments.
+ *  @param[in] argv The command line arguments.
+ *  @return 0 on success.
+ */
 int cmd_config(int argc, char **argv) {
   char *rcpath;
   int i;

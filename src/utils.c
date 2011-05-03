@@ -1,3 +1,7 @@
+/** @file
+ *  @ingroup utils
+ *  Implementation of utility functions.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,11 +13,19 @@
 
 #include "utils.h"
 
+/** Check whether a given file exists.
+ *  @param[in] filename The filename to check.
+ *  @return 1 if the file exists 0 otherwise.
+ */
 int utils_file_exists(const unsigned char *filename) {
   struct stat f;
   return stat(filename, &f) == 0 ? 1 : 0;
 }
 
+/** Get the absolute path of the rc-file.
+ *  @return A pointer to a newly allocated string containing
+ *          the path to the rc-file.
+ */
 char * utils_get_rcpath(void) {
   char *home;
   char *rcpath;
@@ -46,6 +58,13 @@ char * utils_get_rcpath(void) {
   return rcpath;
 }
 
+/** Insert data at the beginning of the given list. Each list element
+ *  should be freed with free().
+ *  @param[in] list A pointer to the list where the data should be
+ *                  stored or NULL if the list is empty.
+ *  @param[in] data The data to store.
+ *  @return The new beginning of the list.
+ */
 UtilsList *utils_list_prepend(UtilsList *list, void *data) {
   UtilsList *ins = malloc(sizeof(UtilsList));
   assert(ins);

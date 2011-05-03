@@ -1,3 +1,7 @@
+/** @file
+ *  @ingroup commands
+ *  Implementation of the show command.
+ */
 #define _XOPEN_SOURCE
 #include <time.h>
 #include <stdio.h>
@@ -15,6 +19,11 @@ int _cmd_show_parse_cmdline(int argc, char **argv,
                             char **date, 
                             char **schema);
 
+/** Run the show command
+ *  @param[in] argc The number of command line arguments.
+ *  @param[in] argv The command line arguments.
+ *  @return 0 on success.
+ */
 int cmd_show(int argc, char **argv) {
   mensaSchema *schema = NULL;
   int i;
@@ -184,7 +193,15 @@ int cmd_show(int argc, char **argv) {
 }
 
 /** Loop through command line arguments, check whether they
- *  are a valid date, valid schema or settings; ignore argv[0]
+ *  are a valid date, valid schema or settings; ignore argv[0].
+ *  Return an error if not all arguments could be recognized.
+ *  @param[in] argc The number of command line arguments.
+ *  @param[in] argv The command line arguments.
+ *  @param[out] date The command line argument containing a date
+ *                   or NULL if none exists.
+ *  @param[out] schema The name of the schema if specified.
+ *  @return 0 if all arguments were recognized, 1 if an error occured.
+ *  @internal
  */
 int _cmd_show_parse_cmdline(int argc, char **argv, 
                             char **date, 

@@ -1,8 +1,14 @@
+/** @file
+ *  @ingroup output
+ *  Implementation of the output utilities.
+ */
 #include "mensa-output.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../config.h"
 
+#if HAVE_TERM_H && HAVE_LIBTERMCAP
 #include <curses.h>
 #include <term.h>
 #ifdef unix
@@ -10,9 +16,14 @@ static char term_buffer[2048];
 #else
 #define term_buffer 0
 #endif
+#endif
 
-/* print a fixed length string, taking care of utf-8 characters
- * these are assumed to be correct */
+/** Print a string with a minimal width, take care of UTF-8 characters
+ *  @param[in] stream The stream to write to, opened for writing. If this
+ *                    NULL is specified, stdout is used.
+ *  @param[in] str Pointer to the string or NULL.
+ *  @param[in] len Length of the string.
+ */
 void mensa_output_fixed_len_str(FILE *stream, char *str, int len) {
   int k = 0, l = 0;
   FILE *s = stream ? stream : stdout;
@@ -50,7 +61,15 @@ void mensa_output_fixed_len_str(FILE *stream, char *str, int len) {
 
 int _mensa_output_block_line(FILE *stream, char *str, int length);
 
-/** output a block of text of fixed line width
+/** Output a block of text of fixed line width. Break lines at
+ *  whitespaces, commas, periods, semicolons, colons.
+ *  @param[in] stream The file to write to, open for writing. If
+ *                    NULL is given, stdout is used.
+ *  @param[in] str The string for output.
+ *  @param[in] length Maximal length of a line.
+ *  @param[in] indent Number of characters to indent the block.
+ *  @param[in] indent_first_line 1 if the first line should also
+ *                    be indented or 0 if not.
  */
 void mensa_output_block(FILE *stream, char *str, int length,
                         int indent, int indent_first_line) {
@@ -79,8 +98,14 @@ void mensa_output_block(FILE *stream, char *str, int length,
   }
 }
 
-/** writes up to length characters of str to stream
- *  @return offset of the next line */
+/** Writes as much of a line as possible to a file.
+ *  @param[in] stream The file to write to or NULL. If NULL is given
+ *                    stdout is used.
+ *  @param[in] str The string buffer from which the line is read.
+ *  @param[in] length The maximal number of characters to print.
+ *  @return offset of the next line 
+ *  @internal
+ */
 int _mensa_output_block_line(FILE *stream, char *str, int length) {
   int len;
   int i,d;
@@ -134,7 +159,12 @@ int _mensa_output_block_line(FILE *stream, char *str, int length) {
   return last_space+1+offset;
 }
 
+/** Get the terminal width
+ *  @return The width of the terminal or -1 if determination of
+ *          width is not possible.
+ */
 int mensa_output_get_term_width(void) {
+#if HAVE_TERM_H && HAVE_LIBTERMCAP
   char *termtype = getenv("TERM");
   if (termtype == NULL) {
     return -1;
@@ -145,4 +175,7 @@ int mensa_output_get_term_width(void) {
   }
   
   return tgetnum("co");
+#else
+  return -1;
+#endif
 }
