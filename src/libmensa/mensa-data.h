@@ -10,10 +10,10 @@
  */
 /* @{ */
 typedef struct _MensaMeal {
-  char *description;         /**< Description of the meal. */
-  char *type;                /**< The type of the meal. */
-  int order;                 /**< The order of the meal. Lower values 
-                              *   are higher in list. */
+  char *description;         /**< @brief Description of the meal. */
+  char *type;                /**< @brief The type of the meal. */
+  int order;                 /**< @brief The order of the meal.
+                              *   Lower values are higher in list. */
 } MensaMeal;
 /* @} */
 
@@ -21,8 +21,8 @@ typedef struct _MensaMeal {
  */
 /* @{ */
 typedef struct _MensaMealGroup {
-  MensaMeal *meals;          /**< An array of meals in this group. */
-  int meal_count;            /**< The number of meals in this group. */
+  MensaMeal *meals;          /**< @brief An array of meals in this group. */
+  int meal_count;            /**< @brief The number of meals in this group. */
 } MensaMealGroup;
 /* @} */
 

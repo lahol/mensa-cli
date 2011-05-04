@@ -7,13 +7,13 @@
 #ifndef __MENSA_HELPERS_H__
 #define __MENSA_HELPERS_H__
 
-/** List element for single linked list
+/** @brief List element for single linked list
  */
 /* @{ */
 typedef struct _mensaList mensaList;
 struct _mensaList {
-  void *data;            /**< Pointer to the data stored. */
-  mensaList *next;       /**< Pointer to the next element in the list. */
+  void *data;            /**< @brief Pointer to the data stored. */
+  mensaList *next;       /**< @brief Pointer to the next element in the list. */
 };
 /* @} */
 

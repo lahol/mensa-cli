@@ -15,8 +15,8 @@ char * utils_get_rcpath(void);
 /* @{ */
 typedef struct _UtilsList UtilsList;
 struct _UtilsList {
-  void *data;          /**< Pointer to the data stored in the list. */
-  UtilsList *next;     /**< Pointer to the next list element. */
+  void *data;          /**< @brief Pointer to the data stored in the list. */
+  UtilsList *next;     /**< @brief Pointer to the next list element. */
 };
 /* @} */
 

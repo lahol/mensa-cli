@@ -25,41 +25,41 @@
 
 /** @name Format of the source to read from. */
 /* @{ */
-#define MENSA_SOURCE_FORMAT_HTML     1       /**< The source is an html-file */
-#define MENSA_SOURCE_FORMAT_XML      2       /**< The source is an xml-file */
+#define MENSA_SOURCE_FORMAT_HTML     1       /**< @brief The source is an html-file */
+#define MENSA_SOURCE_FORMAT_XML      2       /**< @brief The source is an xml-file */
 /* @} */
 
 /** @name Flags to control the handling of the source. */
 /* @{ */
-#define MENSA_SOURCE_FLAGS_STRFTIME  1<<0  /**< parse source through strftime */
+#define MENSA_SOURCE_FLAGS_STRFTIME  1<<0  /**< @brief parse source through strftime */
 /* @} */
 
-/** Main source information. */
+/** @brief Main source information. */
 /* @{ */
 struct _mensaSchemaSource {
-  int id;           /**< Identifier for that source, referenced by food. */
-  int format;       /**< Format of the source: html, xml, ... */
-  char *source;     /**< URI of that source */
-  int flags;        /**< Flags to control the handling of the source. */
+  int id;           /**< @brief Identifier for that source, referenced by food. */
+  int format;       /**< @brief Format of the source: html, xml, ... */
+  char *source;     /**< @brief URI of that source */
+  int flags;        /**< @brief Flags to control the handling of the source. */
 };
 /* @} */
 
-/** Information where to get a single food from. */
+/** @brief Information where to get a single food from. */
 /* @{ */
 struct _mensaSchemaSourceFood {
-  int source_id;    /**< Source identifier where to read the data from. */
-  int week;         /**< 0 is the current week, 1 the next and so on. */
-  int day;          /**< 0-6, 0 sunday */
-  char *path;       /**< XPath to the field of the food. */
-  char *desc_path;  /**< Relative path to the description of the food. */
+  int source_id;    /**< @brief Source identifier where to read the data from. */
+  int week;         /**< @brief 0 is the current week, 1 the next and so on. */
+  int day;          /**< @brief 0-6, 0 sunday */
+  char *path;       /**< @brief XPath to the field of the food. */
+  char *desc_path;  /**< @brief Relative path to the description of the food. */
 };
 /* @} */
 
-/** Description of a single food. */
+/** @brief Description of a single food. */
 /* @{ */
 struct _mensaSchemaFoodDescription {
-  char *identifier;  /**< The identifier of the description, as found in the source. */
-  char *description; /**< The human readable description, the name to display */
+  char *identifier;  /**< @brief The identifier of the description, as found in the source. */
+  char *description; /**< @brief The human readable description, the name to display */
 };
 /* @} */
 
@@ -68,14 +68,14 @@ struct _mensaSchemaFoodDescription {
  */
 /* @{ */
 struct _mensaSchema {
-  char *schemaName;                           /**< Identifier of the schema. */
-  unsigned char *schemaDesc;                  /**< Description of the schema. */
-  struct _mensaSchemaSource *sources;         /**< Sources of the schema. */
-  int nsources;                               /**< Number of sources of the schema. */
-  struct _mensaSchemaSourceFood *foods;       /**< Food descriptors of the schema. */
-  int nfoods;                                 /**< Number of food descriptors. */
-  struct _mensaSchemaFoodDescription *fdescs; /**< Food descriptions. */
-  int nfdescs;                                /**< Number of food descriptions. */
+  char *schemaName;                           /**< @brief Identifier of the schema. */
+  unsigned char *schemaDesc;                  /**< @brief Description of the schema. */
+  struct _mensaSchemaSource *sources;         /**< @brief Sources of the schema. */
+  int nsources;                               /**< @brief Number of sources of the schema. */
+  struct _mensaSchemaSourceFood *foods;       /**< @brief Food descriptors of the schema. */
+  int nfoods;                                 /**< @brief Number of food descriptors. */
+  struct _mensaSchemaFoodDescription *fdescs; /**< @brief Food descriptions. */
+  int nfdescs;                                /**< @brief Number of food descriptions. */
 };
 /* @} */
 
@@ -406,8 +406,8 @@ void mensa_schema_get_description(mensaSchema *schema, unsigned char **desc) {
  */
 /* @{ */
 struct _SchemaSourceDoc {
-  xmlDocPtr doc;                /**< Document pointer. */
-  xmlXPathContextPtr xpathCtx;  /**< Context for the XPath. */
+  xmlDocPtr doc;                /**< @brief Document pointer. */
+  xmlXPathContextPtr xpathCtx;  /**< @brief Context for the XPath. */
 };
 /* @} */
 

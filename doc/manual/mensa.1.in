@@ -1,9 +1,16 @@
 .TH mensa 1 2011-05-04 "mensa 0.1" "User Manual"
+
 .SH NAME
 mensa \- List available meals of a cafeteria in terminal.
-.SH SYNOPSIS
+
+.SH SYNTAX
 .B mensa 
-[ subcommand [ args ] ]
+[ 
+.I subcommand 
+[ 
+.I args
+]]
+
 .SH DESCRIPTION
 .B mensa
 is a program to list available meals of a given cafeteria in the terminal.
@@ -14,20 +21,43 @@ how to interpret it.
 .P
 The program supports multiple schemas which can be selected either by
 configuration or by specifying it via the command line.
+
 .SH SUBCOMMANDS
 .TP 8
+
 .B show
 Show foods for the given schema.
+If run without arguments the defaults are read from ~/.mensarc.
+If nothing is found there the built in defaults are used 
+(no schema is built in).
+
+You may specify a day either as 
+.IR YYYY-MM-DD " or " monday " through to " sunday ", " today
+.RI "or " tomorrow "."
+ 
+A schema has a name as given in ~/.mensarc (the part after
+.IR schema. ")."
+ 
+Other settings may be overridden as in the 
+.B config 
+sub command.
+
 .TP
 .B config
 When run without arguments, show all configuration settings.
-Use <VAR>=<VALUE> to set a specific variable to the specified value.
-Multiple settings are possible. These settings are written to
-~/.mensarc 
+Use 
+.I <VAR>
+=
+.I <VALUE>
+to set a specific variable to the specified value.
+Multiple settings are possible.
+These settings are written to ~/.mensarc 
+
 .TP
 .B help
 .TP
 .B info
+
 .SH FILES
 .TP 
 .B ~/.mensarc
@@ -35,8 +65,10 @@ Configuration file for a single user.
 .TP
 .B /usr/share/mensa/
 Available schemas.
+
 .SH SEE ALSO
 .B mensarc,
 .B mensa-schema
+
 .SH AUTHOR
 Holger Langenau

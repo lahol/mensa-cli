@@ -8,22 +8,22 @@
 #define __DEFAULTS_H__
 
 /** @enum DefaultsError
- *  Error codes for the defaults module
+ *  @brief Error codes for the defaults module
  */
 /* @{ */
 typedef enum {
-  DEFAULTS_ERROR_OK = 0,            /**< No errors occured. */
-  DEFAULTS_ERROR_TYPE_MISMATCH,     /**< String cannot be converted to 
+  DEFAULTS_ERROR_OK = 0,            /**< @brief No errors occured. */
+  DEFAULTS_ERROR_TYPE_MISMATCH,     /**< @brief String cannot be converted to 
                                          desired type. */
-  DEFAULTS_ERROR_NOTFOUND,          /**< Did not find the specified key. */
+  DEFAULTS_ERROR_NOTFOUND,          /**< @brief Did not find the specified key. */
 } DefaultsError;
 /* @} */
 
-/** Enumeration result. */
+/** @brief Enumeration result. */
 typedef struct _DefaultsEnumResult {
-  int numResults;           /**< The number of results. */
-  unsigned char **keys;     /**< An array of matching keys. */
-  unsigned char **values;   /**< An array of the associated values. */
+  int numResults;           /**< @brief The number of results. */
+  unsigned char **keys;     /**< @brief An array of matching keys. */
+  unsigned char **values;   /**< @brief An array of the associated values. */
 } DefaultsEnumResult;
 
 int defaults_read(unsigned char *filename);

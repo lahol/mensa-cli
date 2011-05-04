@@ -14,22 +14,22 @@
 /** @name Default list flags.
  *  @internal
  */
-/* @{ */
-#define DEFAULTS_LIST_FLAG_NONE          0     /**< no flags */
-#define DEFAULTS_LIST_FLAG_MODIFIED      1<<0  /**< was modified by user (command) */
-#define DEFAULTS_LIST_FLAG_WRITTEN       1<<1  /**< has been written to rc file */
-/* @} */
+/** @{ */
+#define DEFAULTS_LIST_FLAG_NONE          0     /**< @brief no flags @hideinitializer */
+#define DEFAULTS_LIST_FLAG_MODIFIED      1<<0  /**< @brief was modified by user (command) @hideinitializer */
+#define DEFAULTS_LIST_FLAG_WRITTEN       1<<1  /**< @brief has been written to rc file @hideinitializer */
+/** @} */
 
 /** @name Line types of rc file
  *  @internal
  */
-/* @{ */
-#define _DEFAULTS_RC_LINE_KEYVALUE       1     /**< Line is a key/value pair. */
-#define _DEFAULTS_RC_LINE_EMPTY          2     /**< An empty line, possibly whitespaces. */
-#define _DEFAULTS_RC_LINE_COMMENT        3     /**< Line contains a comment. */
-/* @} */
+/** @{ */
+#define _DEFAULTS_RC_LINE_KEYVALUE       1     /**< @brief Line is a key/value pair. @hideinitializer */
+#define _DEFAULTS_RC_LINE_EMPTY          2     /**< @brief An empty line, possibly whitespaces. @hideinitializer */
+#define _DEFAULTS_RC_LINE_COMMENT        3     /**< @brief Line contains a comment. @hideinitializer */
+/** @} */
 
-/** Defaults list element.
+/** @brief Defaults list element.
  *  @internal
  */
 /* @{ */

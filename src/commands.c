@@ -10,15 +10,15 @@
 #include "commands.h"
 #include "defaults.h"
 
-/** List of known commands.
+/** @brief List of known commands.
  */
 /* @{ */
 typedef struct _CmdList CmdList;
 struct _CmdList {
-  char cmd_name[32];              /**< The name of the command. */
-  CMD_CALLBACK cmd_callback;      /**< Callback function to run the command. */
-  CMD_HELP_CALLBACK cmd_help;     /**< Callback function to print help for that command. */
-  CmdList *next;                  /**< Next command in list. */
+  char cmd_name[32];              /**< @brief The name of the command. */
+  CMD_CALLBACK cmd_callback;      /**< @brief Callback function to run the command. */
+  CMD_HELP_CALLBACK cmd_help;     /**< @brief Callback function to print help for that command. */
+  CmdList *next;                  /**< @brief Next command in list. */
 };
 /* @} */
 
