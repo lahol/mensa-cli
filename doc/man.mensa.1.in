@@ -1,8 +1,0 @@
-.TH mensa 1 2011-05-02
-
-.SH NAME
-mensa \- List available meals of cafeteria in terminal.
-
-.SH SYNOPSIS
-.B mensa [subcommand] [args]
-

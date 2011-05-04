@@ -1,0 +1,42 @@
+.TH mensa 1 2011-05-04 "mensa 0.1" "User Manual"
+.SH NAME
+mensa \- List available meals of a cafeteria in terminal.
+.SH SYNOPSIS
+.B mensa 
+[ subcommand [ args ] ]
+.SH DESCRIPTION
+.B mensa
+is a program to list available meals of a given cafeteria in the terminal.
+Before it is ready to use, you should configure at least one schema and
+set this to the default.
+A schema contains all necessary information where to get the data from and
+how to interpret it.
+.P
+The program supports multiple schemas which can be selected either by
+configuration or by specifying it via the command line.
+.SH SUBCOMMANDS
+.TP 8
+.B show
+Show foods for the given schema.
+.TP
+.B config
+When run without arguments, show all configuration settings.
+Use <VAR>=<VALUE> to set a specific variable to the specified value.
+Multiple settings are possible. These settings are written to
+~/.mensarc 
+.TP
+.B help
+.TP
+.B info
+.SH FILES
+.TP 
+.B ~/.mensarc
+Configuration file for a single user.
+.TP
+.B /usr/share/mensa/
+Available schemas.
+.SH SEE ALSO
+.B mensarc,
+.B mensa-schema
+.SH AUTHOR
+Holger Langenau
