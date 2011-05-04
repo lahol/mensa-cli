@@ -22,6 +22,9 @@ struct _CmdList {
 };
 /* @} */
 
+/** The list of known commands.
+ *  @internal
+ */
 CmdList *_cmd_list = NULL;
 
 CmdList* _command_exists(char *name);

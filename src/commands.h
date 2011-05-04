@@ -7,9 +7,13 @@
 #ifndef __COMMANDS_H__
 #define __COMMANDS_H__
 
-/** @typedef Callback for a subcommand of mensa. */
+/** @typedef CMD_CALLBACK 
+ * Callback for a subcommand of mensa.
+ */
 typedef int (*CMD_CALLBACK)(int, char**);
-/** @typedef Callback to print help text for a command. */
+/** @typedef CMD_HELP_CALLBACK
+ *  Callback to print help text for a command.
+ */
 typedef void (*CMD_HELP_CALLBACK)(void);
 
 int command_add(char *name, CMD_CALLBACK cb, 

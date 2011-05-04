@@ -555,8 +555,8 @@ DefaultsError defaults_get_boolean(unsigned char *key, int *value) {
 /** Enumerate default settings with the specified prefix and store them
  *  in result. If prefix is NULL return all.
  *  @param[in] prefix Prefix of the setting or NULL
- *  @result[out] Pointer to the result struct. Should be freed with
- *               defaults_enum_result_free().
+ *  @param[out] result Pointer to the result struct. Should be freed with
+ *                     defaults_enum_result_free().
  */
 void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result) {
   UtilsList *res_list = NULL;

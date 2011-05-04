@@ -1,24 +1,55 @@
+/** @file
+ *  @ingroup libhelpers
+ *  Implementation of helper functions for libmensa.
+ */
 #include "mensa-helpers.h"
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
+/** @brief Prepend list with new data element.
+ *  @param[in] list The list to be prepended or NULL if list is empty.
+ *  @param[in] data The data to store.
+ *  @return A pointer to the new beginning of the list.
+ */
 mensaList *mensa_list_prepend(mensaList *list, void *data) {
   mensaList *ins = malloc(sizeof(mensaList));
+  assert(ins);
   ins->next = list;
   ins->data = data;
   return ins;
 }
 
-
-/* TODO!! */
+/** @brief Reverse order of elements in list.
+ *
+ *  @note This function doesn't do anything at the moment. Since all
+ *        lists are only used temporarily at the moment as their data
+ *        is mapped to arrays when it is returned (if at all), the
+ *        order of the elements doesn't really matter.
+ *
+ *  @param[in] list The list to reverse.
+ *  @return The new head of the list.
+ *  @todo
+ */
 mensaList *mensa_list_reverse(mensaList *list) {
   return list;
 }
 
 char _mensa_next_nonws(char *str, int *offset);
 
-/** removes leading and trailing whitespaces; double whitespaces
- *  and whitespaces in front of ,.; if inner is true
+/** @brief Remove dispensable characters in string.
+ *  Removes leading and trailing whitespaces; double whitespaces
+ *  and whitespaces in front of ,.; if inner is true.
+ *
+ *  @note Non-break space (U+00A0) and CR and LF are considered
+ *        to be a whitespace.
+ *
+ *  @param[in] str The string to beatify. Note that this operation
+ *                 is in place, thus the string will be modified.
+ *  @param[in] inner 1 if inner whitespaces and should be mapped
+ *                   to a single space (0x20) or are removed
+ *                   completly if they are in front of commas,
+ *                   periods, semicolons or colons. 0 if not.
  */
 void mensa_string_beautify(char *str, int inner) {
   char *buffer = NULL;
@@ -129,6 +160,12 @@ void mensa_string_beautify(char *str, int inner) {
   str[i] = '\0';
 }
 
+/** Find the next character that is not a whitespace.
+ *  @param[in] str The string to find the next non-whitespace in.
+ *  @param[out] offset The offset of the found character.
+ *  @return The character found.
+ *  @internal
+ */
 char _mensa_next_nonws(char *str, int *offset) {
   int k = 0;
   if (!str) return 0;

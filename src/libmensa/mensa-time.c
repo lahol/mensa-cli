@@ -1,3 +1,7 @@
+/** @file
+ *  @ingroup libmensa
+ *  Handling of mensa specific dates.
+ */
 #define _XOPEN_SOURCE   /* glibc2 needs this */
 #include <time.h>
 #include "mensa-time.h"
@@ -5,6 +9,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+/** @brief Parse time given as string.
+ *  The string may be in the form %Y-%m-%d or (case-insensitive) 
+ *  today, tomorrow, monday, ..., sunday
+ *  @param[in] str The string to parse.
+ *  @param[out] date The parsed date.
+ *  @return 0 if the date could be parsed, 1 if an error occured or
+ *          the string is not in an appropriate form.
+ *  @see mensa_translate_date
+ */
 int mensa_parse_time(char *str, mensaDate *date) {
   time_t current_time;
   time_t target_time;
@@ -70,6 +83,12 @@ int mensa_parse_time(char *str, mensaDate *date) {
   return 0;
 }
 
+/** @brief Translate a date.
+ *  Uses information of day, month and year to calculate the week and day of the week
+ *  from the current time.
+ *  @param[in,out] date The date to translate.
+ *  @return 0 on success, 1 otherwise.
+ */
 int mensa_translate_date(mensaDate *date) {
   time_t current_time;
   time_t target_time;

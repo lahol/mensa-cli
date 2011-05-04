@@ -6,8 +6,8 @@
  *  Provided that the information is available in some form of html/xml a
  *  schema can be used to retrieve the information.
  *
- *  At least one schema file should be specified via schema.<name>=<path> and
- *  activated via show.schema=<name>. This can be done in the file ~/.mensarc
+ *  At least one schema file should be specified via schema. \e name=\e path and
+ *  activated via show.schema=\e name. This can be done in the file ~/.mensarc
  *  Mensa-CLI also provides a shared library `libmensa' which is responsible
  *  for all parsing.
  * 
@@ -32,11 +32,22 @@
 #include "defaults.h"
 #include "cmd.h"
 
+/** @brief Run the info command.
+ *  @param[in] argc The number of command line arguments.
+ *  @param[in] argv The command line arguments.
+ *  @return 0
+ */
 int cmd_info(int argc, char **argv) {
   printf("Info\n");
   return 0;
 }
 
+/** @brief Entry point for the program.
+ *  Initialize all subsystems, invoke the commands and clean up.
+ *  @param[in] argc The number of command line arguments.
+ *  @param[in] argv The command line arguments.
+ *  @return 0 on success, 1 otherwise.
+ */
 int main(int argc, char **argv) {
   char *rcpath = NULL;
   setlocale(LC_ALL, "");

@@ -1,3 +1,8 @@
+/** @file
+ *  @ingroup schema
+ *  @brief Implementation of the schema handling.
+ *  This is the core of libmensa
+ */
 #include "mensa-schema.h"
 #include "mensa-helpers.h"
 #include <stdlib.h>
@@ -18,47 +23,76 @@
 #define _XOPEN_SOURCE   /* glibc2 needs this */
 #include <time.h>
 
+/** @name Format of the source to read from. */
+/* @{ */
+#define MENSA_SOURCE_FORMAT_HTML     1       /**< The source is an html-file */
+#define MENSA_SOURCE_FORMAT_XML      2       /**< The source is an xml-file */
+/* @} */
 
-#define MENSA_SOURCE_FORMAT_HTML     1
-#define MENSA_SOURCE_FORMAT_XML      2
-
+/** @name Flags to control the handling of the source. */
+/* @{ */
 #define MENSA_SOURCE_FLAGS_STRFTIME  1<<0  /**< parse source through strftime */
+/* @} */
 
+/** Main source information. */
+/* @{ */
 struct _mensaSchemaSource {
-  int id;           /**< identifier for that source */
-  int format;       /**< html, xml, ... */
-  char *source;     /**< uri of that source */
-  int flags;        /**< flags */
+  int id;           /**< Identifier for that source, referenced by food. */
+  int format;       /**< Format of the source: html, xml, ... */
+  char *source;     /**< URI of that source */
+  int flags;        /**< Flags to control the handling of the source. */
 };
+/* @} */
 
+/** Information where to get a single food from. */
+/* @{ */
 struct _mensaSchemaSourceFood {
-  int source_id;    /**< where to read the data from */
+  int source_id;    /**< Source identifier where to read the data from. */
   int week;         /**< 0 is the current week, 1 the next and so on. */
   int day;          /**< 0-6, 0 sunday */
-  char *path;       /**< xpath to the field of the food */
-  char *desc_path;  /**< relative path to the description */
-  /*char *data_path;*/  /**< xpath to get the data, relative to the main path */
+  char *path;       /**< XPath to the field of the food. */
+  char *desc_path;  /**< Relative path to the description of the food. */
 };
+/* @} */
 
+/** Description of a single food. */
+/* @{ */
 struct _mensaSchemaFoodDescription {
-/*  char *desc_path;*/   /**< xpath to get the description, relative to the main path */
-  char *identifier;  /**< the identifier of the description */
-  char *description; /**< the human readable description */
+  char *identifier;  /**< The identifier of the description, as found in the source. */
+  char *description; /**< The human readable description, the name to display */
 };
+/* @} */
 
+/** @brief The schema struct.
+ *  Opaque structure holding all necessary information about the schema.
+ */
+/* @{ */
 struct _mensaSchema {
-  char *schemaName;                     /**< identifier of the schema */
-  unsigned char *schemaDesc;            /**< description of the schema */
-  struct _mensaSchemaSource *sources;   /**< sources of the schema */
-  int nsources;                         /**< number of sources of the schema */
-  struct _mensaSchemaSourceFood *foods;       /**< food descriptors of the schema */
-  int nfoods;                           /**< number of food descriptors */
-  struct _mensaSchemaFoodDescription *fdescs; /**< food descriptions */
-  int nfdescs;                          /**< number of food descriptions */
+  char *schemaName;                           /**< Identifier of the schema. */
+  unsigned char *schemaDesc;                  /**< Description of the schema. */
+  struct _mensaSchemaSource *sources;         /**< Sources of the schema. */
+  int nsources;                               /**< Number of sources of the schema. */
+  struct _mensaSchemaSourceFood *foods;       /**< Food descriptors of the schema. */
+  int nfoods;                                 /**< Number of food descriptors. */
+  struct _mensaSchemaFoodDescription *fdescs; /**< Food descriptions. */
+  int nfdescs;                                /**< Number of food descriptions. */
 };
+/* @} */
 
+/** @brief Size of internal buffers.
+ *  @internal
+ */
 #define BUFFER_SIZE    2048
 
+/** @brief Read a schema definition from a given file.
+ *
+ *  A schema definition is an xml file, containing a list of sources,
+ *  food descriptions and food paths.
+ *
+ *  @param[in] filename The filename to read the definition from.
+ *  @return If successful a pointer to the new schema. Should be
+ *          freed with mensa_schema_free().
+ */
 mensaSchema * mensa_schema_read_from_file(const char *filename) {
   mensaSchema *schema = NULL;
   xmlDocPtr doc = NULL;
@@ -301,6 +335,10 @@ mensaSchema * mensa_schema_read_from_file(const char *filename) {
   return schema;
 }
 
+/** @brief Free allocated memory of a schema.
+ *  @param[in] schema A pointer to a schema struct to free.
+ *  @see mensa_schema_read_from_file
+ */
 void mensa_schema_free(mensaSchema *schema) {
   int i;
   if (schema) {
@@ -344,6 +382,15 @@ void mensa_schema_free(mensaSchema *schema) {
   }
 }
 
+/** @brief Return a description of the current schema.
+ *
+ *  This is the description of the schema as given in the schema definition.
+ *  This may be empty.
+ *
+ *  @param[in] schema The schema to get the definition for.
+ *  @param[out] desc The description of the schema if found. Should be freed
+ *                   with free().
+ */
 void mensa_schema_get_description(mensaSchema *schema, unsigned char **desc) {
   if (!desc) return;
   *desc = NULL;
@@ -354,16 +401,26 @@ void mensa_schema_get_description(mensaSchema *schema, unsigned char **desc) {
   }
 }
 
+/** @brief Compound information of a schema source document.
+ *  @internal
+ */
+/* @{ */
 struct _SchemaSourceDoc {
-  xmlDocPtr doc;
-  xmlXPathContextPtr xpathCtx;
+  xmlDocPtr doc;                /**< Document pointer. */
+  xmlXPathContextPtr xpathCtx;  /**< Context for the XPath. */
 };
+/* @} */
 
 struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *source,
                                                     mensaDate *date);
 void _mensa_schema_free_source_doc(struct _SchemaSourceDoc *doc);
 char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path);
 
+/** @brief Return an array of available foods found for the given schema and date.
+ *  @param[in] schema The schema to get the foods from.
+ *  @param[in] date The date to find the data for.
+ *  @return A group of meals found.
+ */
 MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, mensaDate *date) {
   struct _SchemaSourceDoc **docs = NULL;
   struct _SchemaSourceDoc *cur_doc = NULL;
@@ -399,8 +456,6 @@ MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, mensaDate *date) {
         }
       }
       if (cur_doc) {
-        /*strcpy(path, schema->foods[i].path);
-        strcat(path, schema->foods[i].data_path);*/
         data = _mensa_schema_get_data(cur_doc, schema->foods[i].path);
         if (data) {
           list = mensa_list_prepend(list, (void*)data);
@@ -408,13 +463,10 @@ MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, mensaDate *date) {
           strcpy(path, schema->foods[i].path);
           strcat(path, "/");
           strcat(path, schema->foods[i].desc_path);
-/*          fprintf(stderr, "desc-path: %s\n", path);*/
           data = _mensa_schema_get_data(cur_doc, path);
           dindex = -1;
           if (data) {
-/*            fprintf(stderr, "try to find \"%s\" in %d descs\n", data, schema->nfdescs);*/
             for (k = 0; k < schema->nfdescs; k++) {
-/*              fprintf(stderr, "  %d: %s\n", k, schema->fdescs[k].identifier);*/
               if (!strcmp(data, schema->fdescs[k].identifier)) {
                 dindex = k;
                 break;
@@ -469,6 +521,14 @@ MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, mensaDate *date) {
   return group;
 }
 
+/** @brief Prepare source to read data from.
+ *  @param[in] source The source definition.
+ *  @param[in] date If the source is date dependent, i.e. if the source should 
+ *                  be parsed with strftime this must not be NULL. Otherwise
+ *                  it is ignored.
+ *  @return New compound source information.
+ *  @internal
+ */
 struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *source,
                                                     mensaDate *date) {
   char path_buf[2048];
@@ -518,18 +578,6 @@ struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *s
     return NULL;
   }
   
-/*  xmlNodePtr root = xmlDocGetRootElement(doc->doc);
-  if (root) {
-    fprintf(stderr, "root-element: \"%s\"\n", (char*)root->name);
-    if (root->nsDef) {
-      fprintf(stderr, " ns-prefix: \"%s\"\n", root->nsDef->prefix);
-      fprintf(stderr, " ns-href  : \"%s\"\n", root->nsDef->href);
-    }
-  }
-  else {
-    fprintf(stderr, "no root-element\n");
-  }*/
-  
   /* get context */
   doc->xpathCtx = xmlXPathNewContext(doc->doc);
   if (!doc->xpathCtx) {
@@ -542,6 +590,10 @@ struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *s
   return doc;
 }
 
+/** @brief Free source document information.
+ *  @param[in] doc The compound information to free.
+ *  @internal
+ */
 void _mensa_schema_free_source_doc(struct _SchemaSourceDoc *doc) {
   if (doc) {
     if (doc->xpathCtx) {
@@ -554,6 +606,11 @@ void _mensa_schema_free_source_doc(struct _SchemaSourceDoc *doc) {
   }
 }
 
+/** @brief Print all children of a node. Only for debug.
+ *  @param[in] node The node to print the children.
+ *  @param[in] level Used for indention.
+ *  @internal
+ */
 void _print_children(xmlNode *node, int level) {
   if (!node) return;
   xmlNode *cur;
@@ -579,6 +636,14 @@ void _print_children(xmlNode *node, int level) {
   }
 }
 
+/** @brief Get data from source for given path.
+ *  @param[in] doc The source document.
+ *  @param[in] path The XPath for the data element.
+ *  @return A beatified string with the data if found, otherwise NULL.
+ *          If the resulting string is empty NULL is returned.
+ *  @internal
+ *  @see mensa_string_beautify
+ */
 char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
   xmlXPathObjectPtr xpathObj;
   char buffer[BUFFER_SIZE];
@@ -593,7 +658,7 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
   
   xpathObj = xmlXPathEval((xmlChar*)path, doc->xpathCtx);
   if (!xpathObj) {
-    fprintf(stderr, "could not evaluate expression\n");
+    fprintf(stderr, "Could not evaluate expression.\n");
     return NULL;
   }
   
@@ -624,39 +689,7 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
     }
   }
   
-  /* ltrim, rtrim: remove leading and trailing whitespaces */
-/*  len = strlen(buffer);
-  for (i = len-1; i >= 0; i--) {
-    if (buffer[i] == ' ' ||
-        buffer[i] == '\t' ||
-        buffer[i] == 0xd ||
-        buffer[i] == 0xa) {
-      buffer[i] = '\0';
-    }
-    else if (buffer[i] == (char)0xa0 && i > 0 && buffer[i-1] == (char)0xc2) {  *//*no-break space, U+00A0 (0xc2 0xa0)*/
-      /* need type conversion, because a0 < 0 for signed char (compare signed with unsigned otherwise) *//*
-      buffer[i] = buffer[i-1] = '\0';
-      i--;
-    }
-    else {
-      break;
-    }
-  }
-  i = 0;
-  do {
-    if (buffer[i] != ' ' &&
-        buffer[i] != '\t' &&
-        buffer[i] != 0xa &&
-        buffer[i] != 0xd) {
-      if (buffer[i] != (char)0xc2 || buffer[i+1] != (char)0xa0) {  *//*no-break space, U+00A0 (0xc2 0xa0)*/
-/*        break;
-      }
-      else {
-        i++;
-      }
-    }
-    i++;
-  } while (buffer[i] != '\0');*/
+  /* remove spaces and more */
   mensa_string_beautify(buffer, 1);
   
   xmlXPathFreeObject(xpathObj);
@@ -667,12 +700,4 @@ char * _mensa_schema_get_data(struct _SchemaSourceDoc *doc, char *path) {
   else {
     return NULL;
   }
-  
-/*  if (buffer[i] != '\0') {*/ /* i.e. strlen == 0 *//*
-    return strdup(&buffer[i]);
-  }
-  else {
-    return NULL;
-  }*/
 }
-

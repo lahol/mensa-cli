@@ -1,15 +1,29 @@
+/** @file
+ *  @ingroup libmensa
+ *  Header file with transparent data structures for communication with
+ *  an application.
+ */
 #ifndef __MENSA_DATA_H__
 #define __MENSA_DATA_H__
 
+/** @brief A single meal.
+ */
+/* @{ */
 typedef struct _MensaMeal {
-  char *description;
-  char *type;
-  int order;
+  char *description;         /**< Description of the meal. */
+  char *type;                /**< The type of the meal. */
+  int order;                 /**< The order of the meal. Lower values 
+                              *   are higher in list. */
 } MensaMeal;
+/* @} */
 
+/** @brief A group of meals.
+ */
+/* @{ */
 typedef struct _MensaMealGroup {
-  MensaMeal *meals;
-  int meal_count;
+  MensaMeal *meals;          /**< An array of meals in this group. */
+  int meal_count;            /**< The number of meals in this group. */
 } MensaMealGroup;
+/* @} */
 
 #endif

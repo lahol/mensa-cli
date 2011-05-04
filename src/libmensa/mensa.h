@@ -1,3 +1,7 @@
+/** @defgroup libmensa Mensa menu parsing library.
+ *  @file
+ *  Main library header file. Includes all other necessary headers.
+ */
 #ifndef __MENSA_H__
 #define __MENSA_H__
 
