@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# recursive variables from configure script
+prefix="@prefix@"
+datarootdir="@datarootdir@"
+datadir="@datadir@"
+
+# use configured path or installed path
+if [ $# -lt 1 ]
+then
+schema_path="${datadir}/mensa"
+else
+schema_path=$1
+fi
+
+default_schema=""
+config_file="${HOME}/.mensarc"
+
+# list files
+for f in $(find ${schema_path} -type f)
+do
+  schema_name=$(echo "${f}" | sed 's/\/.*\///g' | sed 's/^mensa-//g' | sed 's/\.xml//g' | sed 's/-schema//g');
+  
+  echo "Adding ${f} as ${schema_name}"
+  
+  echo "schema.${schema_name} = ${f}" >> ${config_file};
+  # use first schema as default
+  if [ "${default_schema}" = "" ]
+  then
+    default_schema="${schema_name}"
+    echo " --> set as default schema."
+  fi
+done;
+
+if [ "${default_schema}" != "" ]
+then
+  echo "---"
+  echo "Written all schema settings to ${config_file}."
+  echo "Type man mensarc for more information how to customize these settings."
+else
+  echo "No schemas found"
+fi

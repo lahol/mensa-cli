@@ -46,4 +46,7 @@ AC_CONFIG_FILES([Makefile
                  src/libmensa/Makefile
                  data/Makefile
                  data/bash_completion.d/Makefile])
+# create script
+AC_CONFIG_FILES([scripts/mensa-init.sh], [chmod +x scripts/mensa-init.sh])
+
 AC_OUTPUT
