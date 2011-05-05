@@ -121,12 +121,21 @@ int cmd_show(int argc, char **argv) {
     }
     else {
       fprintf(stderr, "No schema path specified.\n");
+      mensa_output_block(stderr, "Try running mensa-init.sh in the scripts "
+                      "directory that ships with the source to "
+                      "generate a basic configuration file.",
+                      term_width, 0, 1);
       free(schema_name);
       return 1;
     }
   }
   else {
     fprintf(stderr, "No schema specified.\n");
+    mensa_output_block(stderr, "Try running mensa-init.sh in the scripts "
+                    "directory that ships with the source to "
+                    "generate a basic configuration file or set "
+                    "a default schema with\nshow.schema=<schema_name>",
+                    term_width, 0, 1);
     return 1;
   }
   

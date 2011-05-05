@@ -119,11 +119,11 @@ int _mensa_output_block_line(FILE *stream, char *str, int length) {
 
   len = strlen(str);
   if (len <= length) { /* nothing to cut of, write to output */
-    for (i = 0; str[i] != '\0'; i++) {
+    for (i = 0; str[i] != '\0' && str[i] != '\n'; i++) {
       fputc(str[i], s);
     }
     fputc('\n', s);
-    return len+offset;
+    return i+offset;
   }
   
   i = 0; d = 0;
@@ -136,6 +136,10 @@ int _mensa_output_block_line(FILE *stream, char *str, int length) {
           && str[i+d+1] != '-'))
         || str[i+d] == ':') {
       last_space = i+d;
+    }
+    else if (str[i+d] == '\n') {
+      last_space = i+d;
+      break;
     }
     else if ((str[i+d] & 0xe0) == 0xc0) {
       d++;
