@@ -17,7 +17,7 @@ default_schema=""
 config_file="${HOME}/.mensarc"
 
 # list files
-for f in $(find ${schema_path} -type f)
+for f in $(find ${schema_path} -type f -name *.xml)
 do
   schema_name=$(echo "${f}" | sed 's/\/.*\///g' | sed 's/^mensa-//g' | sed 's/\.xml//g' | sed 's/-schema//g');
   
