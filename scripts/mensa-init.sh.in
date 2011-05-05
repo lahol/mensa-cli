@@ -23,7 +23,7 @@ do
   
   echo "Adding ${f} as ${schema_name}"
   
-  echo "schema.${schema_name} = ${f}" >> ${config_file};
+  echo "schema.${schema_name} = ${f}" >> ${config_file}
   # use first schema as default
   if [ "${default_schema}" = "" ]
   then
@@ -34,6 +34,7 @@ done;
 
 if [ "${default_schema}" != "" ]
 then
+  echo "show.schema = ${default_schema}" >> ${config_file}
   echo "---"
   echo "Written all schema settings to ${config_file}."
   echo "Type man mensarc for more information how to customize these settings."
