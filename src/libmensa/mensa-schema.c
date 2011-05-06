@@ -561,7 +561,8 @@ struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *s
   doc = malloc(sizeof(struct _SchemaSourceDoc));
   assert(doc);
   if (source->format == MENSA_SOURCE_FORMAT_HTML) {
-    doc->doc = htmlReadFile(path_buf, NULL, 0);
+    doc->doc = htmlReadFile(path_buf, NULL, 
+      HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
   }
   else if (source->format == MENSA_SOURCE_FORMAT_XML) {
     doc->doc = xmlReadFile(path_buf, NULL, 0);
