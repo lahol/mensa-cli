@@ -80,7 +80,10 @@ CmdList* _command_exists(char *name) {
 int command_call(int argc, char **argv) {
   unsigned char *cmd_name;
   CmdList *cmd = NULL;
-  if (argc == 1) {
+  if (argc > 1) {
+    cmd = _command_exists(argv[1]);
+  }
+  if (!cmd) {
     defaults_get("cmd.default", &cmd_name);
     if (cmd_name) {
       cmd = _command_exists(cmd_name);
@@ -89,9 +92,6 @@ int command_call(int argc, char **argv) {
     else {
       fprintf(stderr, "No default command specified.\n");
     }
-  }
-  else {
-    cmd = _command_exists(argv[1]);
   }
   if (!cmd) {
     fprintf(stderr, "Command not found.\n");
