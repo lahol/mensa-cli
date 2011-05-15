@@ -3,7 +3,7 @@
 
 dnl configure.in
 AC_PREREQ([2.65])
-AC_INIT([Mensa CLI], [0.1], [holger.langenau@s2004.tu-chemnitz.de])
+AC_INIT([Mensa CLI], [0.1~1], [holger.langenau@s2004.tu-chemnitz.de])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
