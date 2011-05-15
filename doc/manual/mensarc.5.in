@@ -1,0 +1,149 @@
+.TH mensarc 5 2011-05-15 "@PACKAGE_STRING@" "User Manual"
+
+.SH NAME
+mensarc \- Configuration file for mensa(1)
+
+.SH SYNOPSIS
+.B $HOME/.mensarc
+
+.SH DESCRIPTION
+.B mensa
+obtains its configuration data from a file called
+.IR ".mensarc" "."
+This file is located in the user's home directory:
+
+.RS
+$HOME/.mensarc
+.RE
+
+Individual options can be overridden by specifying the appropriate
+setting when running mensa:
+
+.RS
+$ mensa <command> <key>=<value> ...
+.RE
+
+The mensa configuration file consists of a series of "assignments"
+in each line. The "assignments" have the syntax:
+
+.RS
+<key>=<value>
+.RE
+
+where:
+.RS
+.TP
+<key>
+is one of the keys described below
+
+.TP
+<value>
+is the value the variable is to be set to.
+.RE
+
+and set a configuration key to a certain value. The equal sign ("=") is used
+to separate the variable name from the value to be set.
+Equal signs in the value are allowed.
+Leading and trailing whitespaces are ignored.
+
+The hash mark, or pound sign ("#") is used as a "comment" character.
+It can be used to annotate the configuration file.
+All text after the character to the end of the line is ignored.
+No mixed lines are allowed, i.e. if the line starts with an assignment
+the hash mark is considered as part of the value.
+
+You can use "yes", "y", "1", "+", "on", "true", "t", "enabled" or
+"no", "n", "0", "-", "off", "false", "f", "disabled" to enable or disable a
+Boolean setting, respectively.
+
+.SH EDITING
+You can edit your .mensarc file by hand if you wish, or you can use the 'config'
+command. To permanently set a value in your .mensarc file, use this command:
+
+.RS
+$ mensa config <key>=<value> ...
+.RE
+
+To unset an entry, use this command:
+
+.RS
+$ mensa config <key>= ...
+.RE
+
+Note, that this does not delete the assignment.
+Currently the only method to achieve this is by manually removing it from .mensarc.
+
+Mensa will also display all your settings with this command:
+
+.RS
+$ mensa config
+.RE
+
+.SH CONFIGURATION KEYS
+Valid key names and their default values are:
+
+.TP
+.B cmd.default=show
+This is the default command to run, when mensa is invoked without a valid
+command name as first argument.
+
+.TP
+.B show.date=today
+This is the default day to be displayed.
+Valid values are "today", "tomorrow", "monday", "tuesday", "wednesday", 
+"thursday", "friday", "saturday", "sunday" or a fixed date in the form
+YYYY-MM-DD.
+
+.TP
+.B show.description=yes
+Display the description of the used schema.
+
+.TP
+.B show.schema=
+The name of the schema to be used.
+
+.TP
+.B show.header=Offers for %A, %x
+The header to be displayed when invoking the show command.
+This string is parsed with
+.BR strftime "(3)"
+so you can use all the placeholders defined there.
+Note that mensa does only care about dates and not about the time.
+It is no error to specify a placeholder like %H but the result maybe
+not what you want.
+
+.TP
+.B show.max-width=80
+The width of tables used when ncurses support is not available or to
+limit the output length in wider terminals.
+Leave the value blank to disable this setting.
+Note that this may produce undefined output when ncurses support is
+not available.
+
+.SS SCHEMAS
+
+Schemas are referenced by a unique name, defined with the schema-key.
+To register a new schema called
+.I mymenu
+use the following assignment:
+
+.RS
+.B schema.mymenu=<path-to-schema-file>
+.RE
+
+where
+.I <path-to-schema-file>
+is a valid path to the appropriate schema file.
+
+You may override the description of the schema (if given) with the
+assignment
+
+.RS
+.B schema.<name>.description=<description>
+.RE
+
+.SH SEE ALSO
+.BR mensa "(1), " mensa-schema "(5)"
+
+.SH AUTHOR
+Holger Langenau

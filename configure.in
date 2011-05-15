@@ -7,6 +7,7 @@ AC_INIT([Mensa CLI], [0.1], [holger.langenau@s2004.tu-chemnitz.de])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 # no need to reconfigure if not explicitly ./configure --enable-maintainer-mode
 # is run
@@ -45,8 +46,23 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/libmensa/Makefile
                  data/Makefile
-                 data/bash_completion.d/Makefile])
+                 data/bash_completion.d/Makefile
+                 doc/manual/Makefile])
 # create script
 AC_CONFIG_FILES([scripts/mensa-init.sh], [chmod +x scripts/mensa-init.sh])
+
+# man pages
+# substitute data dir recursivly so that we can use this in man page
+eval "FULL_DATA_DIR=$datadir";
+while test -n "$(echo $FULL_DATA_DIR | sed -n 's/[^\$]//p')";
+do
+  eval "FULL_DATA_DIR=$FULL_DATA_DIR";
+done
+
+AC_SUBST([FULL_DATA_DIR])
+
+AC_CONFIG_FILES([doc/manual/mensa.1])
+AC_CONFIG_FILES([doc/manual/mensarc.5])
+AC_CONFIG_FILES([doc/manual/mensa-schema.5])
 
 AC_OUTPUT

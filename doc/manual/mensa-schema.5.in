@@ -1,0 +1,92 @@
+.TH mensa-schema 5 2011-05-15 "@PACKAGE_STRING@" "User Manual"
+
+.SH NAME
+mensa-schema \- Schema definition file format for mensa(1)
+
+.SH DESCRIPTION
+.B mensa
+reads the schema definition from an xml file.
+This file can be located anywhere you like.
+Default schemas are located in @FULL_DATA_DIR@/mensa.
+
+.SH ELEMENTS
+.SS mensaschema
+This is the root element. All other elements are at the second level.
+.SS name
+This element takes no arguments.
+The content should be the unique name of the schema.
+Exactly one element of this type is allowed.
+.SS description
+This element takes no arguments.
+The content is the human readable name of the schema.
+At most one element of this type is allowed.
+.SS source
+.TP
+.B id
+The number of the source. Unique in this schema.
+.TP
+.B format
+The format of the source. May be xml or html.
+.TP
+.B flags
+Set this to 1 if the source file should be parsed by 
+.BR "strftime" "(3)"
+or 0 if not.
+.TP
+.B file
+The URI of the source file.
+.P
+This element has no content. Multiple elements of this type are allowed.
+.SS fooddescription
+.TP
+.B identifier
+The identifier of a food category as found in the source.
+.P
+The content of this element is the description displayed.
+Multiple elements of this type are allowed.
+
+.SS food
+.TP
+.B source
+Reference the
+.B id
+of a source element.
+
+.TP
+.B path
+An absolute XPath expression where to find the data for this 
+specific meal in the source document.
+
+.TP
+.B description
+An XPath relative to the data position of this specific meal where
+the description as in the fooddescription elements is found.
+
+.TP
+.BR week " (optional)"
+The number of the week this meal belongs to.
+0 is the current week, 1 the next week and so on.
+If omitted the week of the requested date is used.
+
+.TP
+.BR day " (optional)"
+The number of the day this meal belongs to.
+0 is sunday, 1 monday, and so on.
+If omitted the day of the requested date is used.
+.P
+This element has no content.
+Multiple elements of this type are allowed.
+
+.SH NOTES
+The schema definition may change in future versions.
+
+.SH EXAMPLES
+See @FULL_DATA_DIR@/mensa/mensa-tuc-rh-schema.xml and
+@FULL_DATA_DIR@/mensa/mensa-tuc-fnor-schema.xml for
+examples.
+
+.SH SEE ALSO
+.BR mensa "(1), " mensarc "(5)"
+
+.SH AUTOR
+Holger Langenau

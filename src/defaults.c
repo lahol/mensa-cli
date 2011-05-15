@@ -531,13 +531,21 @@ DefaultsError defaults_get_boolean(unsigned char *key, int *value) {
     if (!strcasecmp(tmp->value, "yes") ||
         !strcasecmp(tmp->value, "y") ||
         !strcmp(tmp->value, "1") ||
-        !strcmp(tmp->value, "+")) {
+        !strcmp(tmp->value, "+") ||
+        !strcasecmp(tmp->value, "on") ||
+        !strcasecmp(tmp->value, "true") ||
+        !strcasecmp(tmp->value, "t") ||
+        !strcasecmp(tmp->value, "enabled")) {
       v = 1;
     }
     else if (!strcasecmp(tmp->value, "no") ||
              !strcasecmp(tmp->value, "n") ||
              !strcmp(tmp->value, "0") ||
-             !strcmp(tmp->value, "-")) {
+             !strcmp(tmp->value, "-") ||
+             !strcasecmp(tmp->value, "off") ||
+             !strcasecmp(tmp->value, "false") ||
+             !strcasecmp(tmp->value, "f") ||
+             !strcasecmp(tmp->value, "disabled")) {
       v = 0;
     }
     else {
