@@ -1,3 +1,9 @@
+mensa-cli (0.1ubuntu2) natty; urgency=low
+
+  * Small install fixes (manpage, bash completion)
+
+ -- Holger Langenau <holger.langenau@s2004.tu-chemnitz.de>  Sun, 15 May 2011 19:17:34 +0200
+
 mensa-cli (0.1ubuntu1) natty; urgency=low
 
   * Updated manuals
@@ -10,8 +16,3 @@ mensa-cli (0.1) unstable; urgency=low
 
  -- Holger Langenau <holger.langenau@s2004.tu-chemnitz.de>  Fri, 13 May 2011 10:59:38 +0200
 
-mensa-cli (0.1-1) unstable; urgency=low
-
-  * Updated manuals
-
- -- Holger Langenau <holger.langenau@s2004.tu-chemnitz.de>  Sun, 15 May 2011 18:35:00
