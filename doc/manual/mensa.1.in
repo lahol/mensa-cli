@@ -55,8 +55,18 @@ These settings are written to ~/.mensarc
 
 .TP
 .B help
+When run without arguments, show the available commands.
+Type
+
+.RS
+$ mensa help <command>
+.RE
+
+to display help for a specific command.
+
 .TP
 .B info
+Display version and license, then exit.
 
 .SH FILES
 .TP 
