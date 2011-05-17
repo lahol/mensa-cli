@@ -26,6 +26,7 @@
 #include "cmd.h"
 #include "mensa-output.h"
 #include "utils.h"
+#include "config.h"
 
 /** Run the info command. Output license information.
  *  @param[in] argc The number of command line arguments.
@@ -36,7 +37,8 @@ int cmd_info(int argc, char **argv) {
   int term_width = mensa_output_get_term_width();
   if (term_width == -1) term_width = 80;
   mensa_output_block(stdout,
-    "Mensa-CLI - a command line interface for libmensa",
+    PACKAGE_STRING 
+    " - a command line interface for libmensa",
     term_width, 0, 0);
   mensa_output_block(stdout,
     "Copyright (C) 2011, Holger Langenau",

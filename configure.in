@@ -3,7 +3,7 @@
 
 dnl configure.in
 AC_PREREQ([2.65])
-AC_INIT([Mensa CLI], [0.1-1], [holger.langenau@s2004.tu-chemnitz.de])
+AC_INIT([Mensa CLI], [0.2], [holger.langenau@s2004.tu-chemnitz.de])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
@@ -74,3 +74,14 @@ AC_CONFIG_FILES([doc/manual/mensarc.5])
 AC_CONFIG_FILES([doc/manual/mensa-schema.5])
 
 AC_OUTPUT
+
+echo "-----------------------------------";
+
+if test x$enable_bashcompletion = xyes;
+then
+  echo "Bash completion enabled";
+else
+  echo "Bash completion disabled";
+fi
+
+echo "Now type \`make' and then \`make install'";

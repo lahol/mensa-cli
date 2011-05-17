@@ -57,11 +57,8 @@ These settings are written to ~/.mensarc
 .B help
 When run without arguments, show the available commands.
 Type
-
-.RS
-$ mensa help <command>
-.RE
-
+.B mensa help 
+.I <command>
 to display help for a specific command.
 
 .TP
