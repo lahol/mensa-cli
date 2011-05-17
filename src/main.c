@@ -50,16 +50,6 @@
 #include "defaults.h"
 #include "cmd.h"
 
-/** @brief Run the info command.
- *  @param[in] argc The number of command line arguments.
- *  @param[in] argv The command line arguments.
- *  @return 0
- */
-int cmd_info(int argc, char **argv) {
-  printf("Info\n");
-  return 0;
-}
-
 /** @brief Entry point for the program.
  *  Initialize all subsystems, invoke the commands and clean up.
  *  @param[in] argc The number of command line arguments.
