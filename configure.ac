@@ -15,6 +15,8 @@ AM_MAINTAINER_MODE
 
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
 # Checks for libraries.
@@ -28,7 +30,7 @@ LIBS="$LIBS $XML2_LIBS"
 CFLAGS="$CFLAGS $XML2_CFLAGS"
 
 # Checks for header files.
-AC_CHECK_HEADERS([libintl.h locale.h memory.h stdlib.h string.h])
+AC_CHECK_HEADERS([libintl.h locale.h memory.h stdlib.h string.h fcntl.h])
 AC_CHECK_HEADERS([curses.h term.h], [], [],
 [[#ifdef HAVE_CURSES_H
 #include <curses.h>
