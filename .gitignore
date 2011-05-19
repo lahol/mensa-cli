@@ -27,3 +27,7 @@ sources/
 src/mensa
 stamp-h1
 config.log
+build/
+debian/
+doc/html/
+doc/latex/
