@@ -102,7 +102,7 @@ int cmd_show(int argc, char **argv) {
     fprintf(stderr, "Could not parse date.\n");
     return 1;
   }
-  
+
   mensa_translate_date(&date);
 
   if (arg_schema) {
@@ -183,6 +183,7 @@ int cmd_show(int argc, char **argv) {
     show_tm.tm_mon = date.month-1;
     show_tm.tm_year = date.year-1900;
     show_tm.tm_hour = show_tm.tm_min = show_tm.tm_sec = 0;
+    show_tm.tm_isdst = -1;
     timestamp = mktime(&show_tm);
     memcpy(&show_tm, localtime(&timestamp), sizeof(struct tm));
     if (strftime(format_header, 512, header, &show_tm)) {
