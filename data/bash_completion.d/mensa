@@ -8,7 +8,7 @@ _mensa()
   days="today tomorrow monday tuesday wednesday thursday friday saturday sunday"
 
   if [[ ${COMP_CWORD} == 1 ]] ; then
-  	COMPREPLY=( $(compgen -W "${cmds}" -- ${cur}) )
+  	COMPREPLY=( $(compgen -W "${cmds} ${days}" -- ${cur}) )
 		return 0
 	fi
 
