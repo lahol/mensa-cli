@@ -26,6 +26,8 @@
   <fooddescription
   identifier="Pizza">Pizza</fooddescription>
   <fooddescription identifier="Bioessen">Bioessen</fooddescription>
+  <fooddescription identifier="Kochtöpfe der Welt">Kochtöpfe der Welt</fooddescription>
+  <fooddescription identifier="MensaVital">MensaVital</fooddescription>
   <food source="1"
   path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;mittagessen&quot;]/*[local-name()=&quot;essen&quot;
   and position()=1]" description="@name" />
