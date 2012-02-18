@@ -1,4 +1,4 @@
-.TH mensa-schema 5 2011-05-15 "@PACKAGE_STRING@" "User Manual"
+.TH mensa-schema 5 2011-05-15 "__PACKAGE_STRING__" "User Manual"
 
 .SH NAME
 mensa-schema \- Schema definition file format for mensa(1)
@@ -7,7 +7,7 @@ mensa-schema \- Schema definition file format for mensa(1)
 .B mensa
 reads the schema definition from an xml file.
 This file can be located anywhere you like.
-Default schemas are located in @FULL_DATA_DIR@/mensa.
+Default schemas are located in __FULL_DATA_DIR__/mensa.
 
 .SH ELEMENTS
 .SS mensaschema
@@ -81,8 +81,8 @@ Multiple elements of this type are allowed.
 The schema definition may change in future versions.
 
 .SH EXAMPLES
-See @FULL_DATA_DIR@/mensa/mensa-tuc-rh-schema.xml and
-@FULL_DATA_DIR@/mensa/mensa-tuc-fnor-schema.xml for
+See __FULL_DATA_DIR__/mensa/mensa-tuc-rh-schema.xml and
+__FULL_DATA_DIR__/mensa/mensa-tuc-fnor-schema.xml for
 examples.
 
 .SH SEE ALSO

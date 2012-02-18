@@ -61,20 +61,6 @@ AC_CONFIG_FILES([Makefile
 # create script
 AC_CONFIG_FILES([scripts/mensa-init.sh], [chmod +x scripts/mensa-init.sh])
 
-# man pages
-# substitute data dir recursivly so that we can use this in man page
-eval "FULL_DATA_DIR=$datadir";
-while test -n "$(echo $FULL_DATA_DIR | sed -n 's/[^\$]//p')";
-do
-  eval "FULL_DATA_DIR=$FULL_DATA_DIR";
-done
-
-AC_SUBST([FULL_DATA_DIR])
-
-AC_CONFIG_FILES([doc/manual/mensa.1])
-AC_CONFIG_FILES([doc/manual/mensarc.5])
-AC_CONFIG_FILES([doc/manual/mensa-schema.5])
-
 AC_OUTPUT
 
 echo "-----------------------------------";
