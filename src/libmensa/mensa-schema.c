@@ -144,7 +144,7 @@ mensaSchema * mensa_schema_read_from_file(const char *filename) {
   
   root = xmlDocGetRootElement(doc);
   
-  if (!root || !root->name || xmlStrcmp(root->name, (const xmlChar*)"mensaprofile")) {
+  if (!root || !root->name || xmlStrcmp(root->name, (const xmlChar*)"mensaschema")) {
     xmlFreeDoc(doc);
     free(schema);
     fprintf(stderr, "Invalid root element.\n");
