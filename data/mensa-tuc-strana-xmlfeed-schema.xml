@@ -30,23 +30,23 @@
   <fooddescription identifier="MensaVital">MensaVital</fooddescription>
   <food source="1"
   path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
-  and position()=1]" description="@kategorie" />
+  and position()=1]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
   <food source="1"
   path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
-  and position()=2]" description="@kategorie" />
+  and position()=2]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
   <food source="1"
   path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
-  and position()=3]" description="@kategorie" />
+  and position()=3]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
   <food source="1"
   path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
-  and position()=4]" description="@kategorie" />
+  and position()=4]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
   <food source="1"
   path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
-  and position()=5]" description="@kategorie" />
+  and position()=5]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
   <food source="1"
   path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
-  and position()=6]" description="@kategorie" />
+  and position()=6]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
   <food source="1"
   path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
-  and position()=7]" description="@kategorie" />
+  and position()=7]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
 </mensaschema>
