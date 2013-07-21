@@ -86,8 +86,9 @@ int _mensa_output_block_line(FILE *stream, char *str, int length);
  *  @param[in] str The string for output.
  *  @param[in] length Maximal length of a line.
  *  @param[in] indent Number of characters to indent the block.
- *  @param[in] indent_first_line 1 if the first line should also
- *                    be indented or 0 if not.
+ *  @param[in] indent_first_line >0 if the first line should be indented,
+ *                               <0 shorten first line (e.g. if label is
+ *                               longer than indent)
  */
 void mensa_output_block(FILE *stream, char *str, int length,
                         int indent, int indent_first_line) {
@@ -103,12 +104,13 @@ void mensa_output_block(FILE *stream, char *str, int length,
   }
   len = strlen(str);
   while (offset < len) {
-    if (offset > 0 || (offset == 0 && indent_first_line)) {
+    if (offset > 0 || (offset == 0 && indent_first_line > 0)) {
       for (k = 0; k < indent; k++) {
         fputc(' ', s);
       }
     }
-    delta = _mensa_output_block_line(s, &str[offset], length);
+    delta = _mensa_output_block_line(s, &str[offset],
+                length + (offset == 0 && indent_first_line < 0 ? indent_first_line : 0));
     if (delta == 0) {
       break;
     }

@@ -208,7 +208,8 @@ int cmd_show(int argc, char **argv) {
       mensa_output_fixed_len_str(stdout, type_string, type_str_len);
       printf(": ");
       mensa_output_block(stdout, group->meals[i].description,
-        term_width-18, 18, 0);
+        term_width-type_str_len-2, type_str_len+2,
+          (strlen(type_string) > type_str_len ? type_str_len-strlen(type_string) : 0));
     }
   }
   else {
