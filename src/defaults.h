@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Mensa-CLI is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,18 +30,18 @@
  */
 /* @{ */
 typedef enum {
-  DEFAULTS_ERROR_OK = 0,            /**< @brief No errors occured. */
-  DEFAULTS_ERROR_TYPE_MISMATCH,     /**< @brief String cannot be converted to 
-                                         desired type. */
-  DEFAULTS_ERROR_NOTFOUND,          /**< @brief Did not find the specified key. */
+    DEFAULTS_ERROR_OK = 0,            /**< @brief No errors occured. */
+    DEFAULTS_ERROR_TYPE_MISMATCH,     /**< @brief String cannot be converted to
+                                                  desired type. */
+    DEFAULTS_ERROR_NOTFOUND,          /**< @brief Did not find the specified key. */
 } DefaultsError;
 /* @} */
 
 /** @brief Enumeration result. */
 typedef struct _DefaultsEnumResult {
-  int numResults;           /**< @brief The number of results. */
-  char **keys;              /**< @brief An array of matching keys. */
-  char **values;            /**< @brief An array of the associated values. */
+    int numResults;           /**< @brief The number of results. */
+    char **keys;              /**< @brief An array of matching keys. */
+    char **values;            /**< @brief An array of the associated values. */
 } DefaultsEnumResult;
 
 int defaults_read(char *filename);

@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Libmensa is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,8 +30,8 @@
 /* @{ */
 typedef struct _mensaList mensaList;
 struct _mensaList {
-  void *data;            /**< @brief Pointer to the data stored. */
-  mensaList *next;       /**< @brief Pointer to the next element in the list. */
+    void *data;            /**< @brief Pointer to the data stored. */
+    mensaList *next;       /**< @brief Pointer to the next element in the list. */
 };
 /* @} */
 

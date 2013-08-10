@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Libmensa is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -35,26 +35,28 @@
  *                  via mensa_translate_date().
  *  @return A pointer to a mensa meal group. Should be freed via mensa_free_meals().
  */
-MensaMealGroup* mensa_get_meals(mensaSchema *schema, mensaDate *date) {
-  if (!schema) return NULL;
-  if (!date) return NULL;
-  /*TODO: insert calculations for week and day */
-  return mensa_schema_get_foods(schema, date);
+MensaMealGroup *mensa_get_meals(mensaSchema *schema, mensaDate *date)
+{
+    if (!schema) return NULL;
+    if (!date) return NULL;
+    /*TODO: insert calculations for week and day */
+    return mensa_schema_get_foods(schema, date);
 }
 
 /** @brief Free a list of meals.
  *  @param[in] meals A pointer to a mensa meal group.
  *  @see mensa_get_meals
  */
-void mensa_free_meals(MensaMealGroup *meals) {
-  int i;
-  if (meals) {
-    for (i = 0; i < meals->meal_count; i++) {
-      if (meals->meals[i].description) {
-        free(meals->meals[i].description);
-      }
+void mensa_free_meals(MensaMealGroup *meals)
+{
+    int i;
+    if (meals) {
+        for (i = 0; i < meals->meal_count; i++) {
+            if (meals->meals[i].description) {
+                free(meals->meals[i].description);
+            }
+        }
+        free(meals->meals);
     }
-    free(meals->meals);
-  }
-  free(meals);
+    free(meals);
 }

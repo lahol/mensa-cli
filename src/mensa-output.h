@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Mensa-CLI is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -31,7 +31,7 @@ void mensa_output_fixed_len_str(FILE *stream, char *str, int len);
 
 void mensa_output_block(FILE *stream, char *str, int length,
                         int indent, int indent_first_line);
-                        
+
 int mensa_output_get_term_width(void);
 
 #endif

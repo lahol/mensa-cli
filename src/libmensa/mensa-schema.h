@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Libmensa is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -35,12 +35,12 @@
 
 typedef struct _mensaSchema mensaSchema;
 
-mensaSchema * mensa_schema_read_from_file(const char *filename);
+mensaSchema *mensa_schema_read_from_file(const char *filename);
 void mensa_schema_free(mensaSchema *schema);
 
 void mensa_schema_get_description(mensaSchema *schema, char **desc);
 
-MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, mensaDate *date);
+MensaMealGroup *mensa_schema_get_foods(mensaSchema *schema, mensaDate *date);
 
 /*int mensa_schema_get_path(mensaSchema *schema, int day, int food, char *path);*/
 
