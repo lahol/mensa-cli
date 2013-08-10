@@ -87,7 +87,7 @@ struct _mensaSchemaFoodDescription {
 /* @{ */
 struct _mensaSchema {
   char *schemaName;                           /**< @brief Identifier of the schema. */
-  unsigned char *schemaDesc;                  /**< @brief Description of the schema. */
+  char *schemaDesc;                  /**< @brief Description of the schema. */
   struct _mensaSchemaSource *sources;         /**< @brief Sources of the schema. */
   int nsources;                               /**< @brief Number of sources of the schema. */
   struct _mensaSchemaSourceFood *foods;       /**< @brief Food descriptors of the schema. */
@@ -187,10 +187,10 @@ mensaSchema * mensa_schema_read_from_file(const char *filename) {
         
         content = xmlGetProp(cur, (const xmlChar*)"format");
         if (content) {
-          if (!xmlStrcasecmp(content, "html")) {
+          if (!xmlStrcasecmp(content, (const xmlChar*)"html")) {
             source->format = MENSA_SOURCE_FORMAT_HTML;
           }
-          else if (!xmlStrcasecmp(content, "xml")) {
+          else if (!xmlStrcasecmp(content, (const xmlChar*)"xml")) {
             source->format = MENSA_SOURCE_FORMAT_XML;
           }
           else {
@@ -409,7 +409,7 @@ void mensa_schema_free(mensaSchema *schema) {
  *  @param[out] desc The description of the schema if found. Should be freed
  *                   with free().
  */
-void mensa_schema_get_description(mensaSchema *schema, unsigned char **desc) {
+void mensa_schema_get_description(mensaSchema *schema, char **desc) {
   if (!desc) return;
   *desc = NULL;
   if (schema) {
@@ -642,7 +642,7 @@ void _print_children(xmlNode *node, int level) {
     }
     else {
       fputc('\"', stderr);
-      fputs(cur->name, stderr);
+      fputs((char*)cur->name, stderr);
       fputc('\"', stderr);
       if (cur->nsDef) {
         fprintf(stderr, " (ns-prefix: \"%s\")", cur->nsDef->prefix);

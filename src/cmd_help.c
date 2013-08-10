@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "commands.h"
 #include "cmd.h"
 #include "mensa-output.h"
 #include "utils.h"
@@ -45,7 +46,7 @@ int cmd_help(int argc, char **argv) {
       "Use %s help cmd to show help about this command.\n", argv[0]);
     return 0;
   }
-  else if (argc > 2) {
+  else {
     return command_help(argv[1]);
   } 
 }

@@ -38,7 +38,7 @@ typedef struct _mensaSchema mensaSchema;
 mensaSchema * mensa_schema_read_from_file(const char *filename);
 void mensa_schema_free(mensaSchema *schema);
 
-void mensa_schema_get_description(mensaSchema *schema, unsigned char **desc);
+void mensa_schema_get_description(mensaSchema *schema, char **desc);
 
 MensaMealGroup * mensa_schema_get_foods(mensaSchema *schema, mensaDate *date);
 

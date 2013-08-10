@@ -96,7 +96,7 @@ CmdList* _command_exists(char *name) {
  *          the called command.
  */
 int command_call(int argc, char **argv) {
-  unsigned char *cmd_name;
+  char *cmd_name;
   CmdList *cmd = NULL;
   if (argc > 1) {
     cmd = _command_exists(argv[1]);

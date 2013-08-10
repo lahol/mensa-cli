@@ -35,7 +35,7 @@
  *  @param[in] filename The filename to check.
  *  @return 1 if the file exists 0 otherwise.
  */
-int utils_file_exists(const unsigned char *filename) {
+int utils_file_exists(const char *filename) {
   struct stat f;
   return stat(filename, &f) == 0 ? 1 : 0;
 }

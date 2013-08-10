@@ -25,6 +25,7 @@
 #include <memory.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 
 #include "defaults.h"
 #include "utils.h"
@@ -53,8 +54,8 @@
 /* @{ */
 typedef struct _DefaultsList DefaultsList;
 struct _DefaultsList {
-  unsigned char *key;                          /**< @brief Name of the key. */
-  unsigned char *value;                        /**< @brief The associated value. */
+  char *key;                                   /**< @brief Name of the key. */
+  char *value;                                 /**< @brief The associated value. */
   unsigned long flags;                         /**< @brief Flags of this pair. */
   DefaultsList *next;                          /**< @brief Next element in list. */
 };
@@ -65,11 +66,11 @@ struct _DefaultsList {
  */
 DefaultsList *_defaults_list = NULL;
 
-DefaultsList * _defaults_set(unsigned char *key, unsigned char *value);
-DefaultsList * _defaults_get_key(unsigned char *key);
+DefaultsList * _defaults_set(char *key, char *value);
+DefaultsList * _defaults_get_key(char *key);
 int _defaults_rc_read_line(FILE *stream,
-                           unsigned char **key,
-                           unsigned char **val,
+                           char **key,
+                           char **val,
                            int *type, long *vstart, long *vend);
 void _defaults_rc_skip_spaces(FILE *stream);
 void _defaults_rc_goto_eol(FILE *stream);
@@ -79,11 +80,11 @@ void _defaults_rc_copy_line(FILE *src, FILE *dst);
  *  @param[in] filename The file to read from.
  *  @return 0 if the file could be read or 1 if an error occured.
  */
-int defaults_read(unsigned char *filename) {
+int defaults_read(char *filename) {
   FILE *f;
   int type;
-  unsigned char *key;
-  unsigned char *val;
+  char *key;
+  char *val;
   if (!filename) {
     return 1;
   }
@@ -200,8 +201,8 @@ void _defaults_rc_copy_line(FILE *src, FILE *dst) {
  *  @internal
  */
 int _defaults_rc_read_line(FILE *stream, 
-                           unsigned char **key,
-                           unsigned char **val,
+                           char **key,
+                           char **val,
                            int *type, long *vstart, long *vend) {
   int tok;
   int key_len;
@@ -280,23 +281,23 @@ int _defaults_rc_read_line(FILE *stream,
     val_len = last_non_space;
     
     if (key) {
-      *key = malloc(sizeof(unsigned char*)*(key_len+1));
+      *key = malloc(sizeof(char*)*(key_len+1));
       assert(*key);
       /* goto beginning of key */
       fseek(stream, key_start, SEEK_SET);
       for (i = 0; i < key_len; i++) {
-        (*key)[i] = (unsigned char)fgetc(stream);
+        (*key)[i] = (char)fgetc(stream);
       }
       (*key)[key_len] = '\0';
     }
     
     if (val) {
-      *val = malloc(sizeof(unsigned char*)*(val_len+1));
+      *val = malloc(sizeof(char*)*(val_len+1));
       assert(*val);
       /* goto beginning of value */
       fseek(stream, val_start, SEEK_SET);
       for (i = 0; i < val_len; i++) {
-        (*val)[i] = (unsigned char)fgetc(stream);
+        (*val)[i] = (char)fgetc(stream);
       }
       (*val)[val_len] = '\0';
     }
@@ -318,14 +319,14 @@ int _defaults_rc_read_line(FILE *stream,
  *  @param[in] filename The name of the file to write to.
  *  @return 0 on success, 1 otherwise.
  */ 
-int defaults_write(unsigned char *filename) {
+int defaults_write(char *filename) {
   DefaultsList *setting = NULL;
   FILE *cfgfile = NULL;
   FILE *tmp = NULL;
   int file_exists = 0;
   long vstart, vend;
   long start, i;
-  unsigned char *key;
+  char *key;
   int ltype;
   int first;
   int eof = EOF;
@@ -480,7 +481,7 @@ void defaults_free(void) {
  *                    Should be freed by the caller using free().
  *  @return An error code.
  */
-DefaultsError defaults_get(unsigned char *key, unsigned char **value) {
+DefaultsError defaults_get(char *key, char **value) {
   DefaultsList *tmp = _defaults_get_key(key);
   if (value) {
     if (!tmp) {
@@ -512,7 +513,7 @@ DefaultsError defaults_get(unsigned char *key, unsigned char **value) {
  *  @param[out] value A pointer to a variable to write the value to.
  *  @return An error code.
  */
-DefaultsError defaults_get_int(unsigned char *key, int *value) {
+DefaultsError defaults_get_int(char *key, int *value) {
   DefaultsList *tmp = _defaults_get_key(key);
   int i;
   if (!tmp) {
@@ -539,7 +540,7 @@ DefaultsError defaults_get_int(unsigned char *key, int *value) {
  *  @param[out] value A pointer to a variable to write the value to.
  *  @return An error code.
  */
-DefaultsError defaults_get_boolean(unsigned char *key, int *value) {
+DefaultsError defaults_get_boolean(char *key, int *value) {
   DefaultsList *tmp = _defaults_get_key(key);
   int v;
   if (!tmp) {
@@ -584,7 +585,7 @@ DefaultsError defaults_get_boolean(unsigned char *key, int *value) {
  *  @param[out] result Pointer to the result struct. Should be freed with
  *                     defaults_enum_result_free().
  */
-void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result) {
+void defaults_enum(char *prefix, DefaultsEnumResult *result) {
   UtilsList *res_list = NULL;
   UtilsList *res_next = NULL;
   DefaultsList *tmp = NULL;
@@ -619,13 +620,13 @@ void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result) {
     }
   }
     
-  result->keys = malloc(sizeof(unsigned char*)*result->numResults);
+  result->keys = malloc(sizeof(char*)*result->numResults);
   assert(result->keys);
-  memset(result->keys, 0, sizeof(unsigned char*)*result->numResults);
+  memset(result->keys, 0, sizeof(char*)*result->numResults);
 
-  result->values = malloc(sizeof(unsigned char*)*result->numResults);
+  result->values = malloc(sizeof(char*)*result->numResults);
   assert(result->values);
-  memset(result->values, 0, sizeof(unsigned char*)*result->numResults);
+  memset(result->values, 0, sizeof(char*)*result->numResults);
 
 /*  for (i = result->numResults-1; i >= 0 && res_list; i--, res_list = res_next) {*/
   /* defaults list is also in reverse order */
@@ -681,7 +682,7 @@ void defaults_enum_result_free(DefaultsEnumResult *result) {
  *  @return A pointer to the set modified or inserted.
  *  @internal
  */
-DefaultsList * _defaults_set(unsigned char *key, unsigned char *value) {
+DefaultsList * _defaults_set(char *key, char *value) {
   DefaultsList *tmp;
   if (!key) return NULL;
   tmp = _defaults_get_key(key);
@@ -716,7 +717,7 @@ DefaultsList * _defaults_set(unsigned char *key, unsigned char *value) {
  *  @param[in] value The string representation of the value or NULL.
  *  @see defaults_update()
  */
-void defaults_add(unsigned char *key, unsigned char *value) {
+void defaults_add(char *key, char *value) {
   _defaults_set(key, value);
 }
 
@@ -727,7 +728,7 @@ void defaults_add(unsigned char *key, unsigned char *value) {
  *  @param[in] key The name of the key to set the value for.
  *  @param[in] value The string representation of the value or NULL.
  */
-void defaults_update(unsigned char *key, unsigned char *value) {
+void defaults_update(char *key, char *value) {
   DefaultsList *tmp = _defaults_set(key, value);
   if (tmp) {
     tmp->flags |= DEFAULTS_LIST_FLAG_MODIFIED;
@@ -739,7 +740,7 @@ void defaults_update(unsigned char *key, unsigned char *value) {
  *  @return Pointer to the existing one or NULL if the key was not found.
  *  @internal
  */
-DefaultsList * _defaults_get_key(unsigned char *key) {
+DefaultsList * _defaults_get_key(char *key) {
   DefaultsList *tmp = _defaults_list;
   if (!key) return NULL;
   while (tmp) {

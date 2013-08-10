@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <assert.h>
 
 #include "cmd.h"
@@ -46,17 +47,17 @@ int cmd_show(int argc, char **argv) {
   mensaSchema *schema = NULL;
   int i;
   int res;
-  unsigned char type_string[256];
-  unsigned char *header = NULL;
-  unsigned char format_header[512];
-  unsigned char *date_name = NULL;
+  char type_string[256];
+  char *header = NULL;
+  char format_header[512];
+  char *date_name = NULL;
   char *arg_date = NULL;
   char *arg_schema = NULL; 
-  unsigned char *schema_path = NULL;
+  char *schema_path = NULL;
   char *schema_name = NULL;
-  unsigned char *default_schema = NULL;
-  unsigned char *schema_desc = NULL;
-  unsigned char *schema_desc_key = NULL;
+  char *default_schema = NULL;
+  char *schema_desc = NULL;
+  char *schema_desc_key = NULL;
   int show_desc;
   int type_str_len = 16;
   mensaDate date;
@@ -107,7 +108,7 @@ int cmd_show(int argc, char **argv) {
 
   if (arg_schema) {
     if (arg_schema[0] != '\0') {
-      schema_name = malloc(sizeof(unsigned char)*(strlen(arg_schema)+8));
+      schema_name = malloc(sizeof(char)*(strlen(arg_schema)+8));
       assert(schema_name);
       strcpy(schema_name, "schema.");
       strcat(schema_name, arg_schema);
@@ -117,7 +118,7 @@ int cmd_show(int argc, char **argv) {
     defaults_get("show.schema", &default_schema);
     if (default_schema) {
       if (default_schema[0] != '\0') {
-        schema_name = malloc(sizeof(unsigned char)*(strlen(default_schema)+8));
+        schema_name = malloc(sizeof(char)*(strlen(default_schema)+8));
         assert(schema_name);
         strcpy(schema_name, "schema.");
         strcat(schema_name, default_schema);
@@ -158,7 +159,7 @@ int cmd_show(int argc, char **argv) {
   }
   
   if (show_desc) {
-    schema_desc_key = malloc(sizeof(unsigned char)*(strlen(schema_name)+13));
+    schema_desc_key = malloc(sizeof(char)*(strlen(schema_name)+13));
     strcpy(schema_desc_key, schema_name);
     strcat(schema_desc_key, ".description");
     derr = defaults_get(schema_desc_key, &schema_desc);

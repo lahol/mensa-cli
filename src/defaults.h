@@ -40,22 +40,22 @@ typedef enum {
 /** @brief Enumeration result. */
 typedef struct _DefaultsEnumResult {
   int numResults;           /**< @brief The number of results. */
-  unsigned char **keys;     /**< @brief An array of matching keys. */
-  unsigned char **values;   /**< @brief An array of the associated values. */
+  char **keys;              /**< @brief An array of matching keys. */
+  char **values;            /**< @brief An array of the associated values. */
 } DefaultsEnumResult;
 
-int defaults_read(unsigned char *filename);
-int defaults_write(unsigned char *filename);
+int defaults_read(char *filename);
+int defaults_write(char *filename);
 void defaults_free(void);
 
-DefaultsError defaults_get(unsigned char *key, unsigned char **value);
-DefaultsError defaults_get_int(unsigned char *key, int *value);
-DefaultsError defaults_get_boolean(unsigned char *key, int *value);
+DefaultsError defaults_get(char *key, char **value);
+DefaultsError defaults_get_int(char *key, int *value);
+DefaultsError defaults_get_boolean(char *key, int *value);
 
-void defaults_enum(unsigned char *prefix, DefaultsEnumResult *result);
+void defaults_enum(char *prefix, DefaultsEnumResult *result);
 void defaults_enum_result_free(DefaultsEnumResult *result);
 
-void defaults_add(unsigned char *key, unsigned char *value);
-void defaults_update(unsigned char *key, unsigned char *value);
+void defaults_add(char *key, char *value);
+void defaults_update(char *key, char *value);
 
 #endif
