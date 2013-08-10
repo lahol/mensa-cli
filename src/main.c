@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
   defaults_add("show.schema", "");
   defaults_add("show.clear-cache", "no");
   defaults_add("show.header", "Offers for %A, %x");
-  defaults_add("show.max-width", "80");
+  defaults_add("show.max-width", "0");
   
   rcpath = utils_get_rcpath();
   
