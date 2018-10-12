@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 /** @brief Parse time given as string.
  *  The string may be in the form %Y-%m-%d or (case-insensitive) 

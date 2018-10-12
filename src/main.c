@@ -46,6 +46,8 @@
 #include <locale.h>
 #include <libintl.h>
 
+#include "utils.h"
+
 #include "commands.h"
 #include "defaults.h"
 #include "cmd.h"
