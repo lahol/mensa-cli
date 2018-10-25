@@ -28,6 +28,7 @@
 
 #include "defaults.h"
 #include "utils.h"
+#include <ctype.h>
 
 /** @name Default list flags.
  *  @internal

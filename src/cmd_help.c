@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cmd.h"
+#include "commands.h"
 #include "mensa-output.h"
 #include "utils.h"
 

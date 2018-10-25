@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 dnl configure.in
-AC_PREREQ([2.65])
+AC_PREREQ([2.63])
 AC_INIT([Mensa CLI], [0.2], [holger.langenau@s2004.tu-chemnitz.de])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/main.c])
@@ -25,6 +25,7 @@ AC_CHECK_LIB([c], [memcpy])
 AC_CHECK_LIB([termcap], [tgetent])
 
 PKG_CHECK_MODULES(XML2, [libxml-2.0 >= 2.0.0])
+PKG_CHECK_MODULES(CURL, [libcurl])
 
 LIBS="$LIBS $XML2_LIBS"
 CFLAGS="$CFLAGS $XML2_CFLAGS"
