@@ -21,6 +21,9 @@
   <fooddescription
   identifier="Vegetarieressen">Vegetarieressen</fooddescription>
   <fooddescription identifier="Pastatheke">Pastatheke</fooddescription>
+  <fooddescription identifier="Bioessen">Bioessen</fooddescription>
+  <fooddescription identifier="Kochtöpfe der Welt">Kochtöpfe der Welt</fooddescription>
+  <fooddescription identifier="mensaVital">MensaVital</fooddescription>
   <food source="1" week="0" day="1"
   path="/html/body/div/table[2]//tr/td/table//tr[2]/td[1]/table//tr[2]/td"
   description="../../tr[1]/td" />

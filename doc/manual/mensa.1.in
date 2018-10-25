@@ -1,4 +1,4 @@
-.TH mensa 1 2011-05-04 "@PACKAGE_STRING@" "User Manual"
+.TH mensa 1 2011-05-04 "__PACKAGE_STRING__" "User Manual"
 
 .SH NAME
 mensa \- List available meals of a cafeteria in terminal.

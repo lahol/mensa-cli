@@ -1,4 +1,4 @@
-.TH mensarc 5 2011-05-15 "@PACKAGE_STRING@" "User Manual"
+.TH mensarc 5 2011-05-15 "__PACKAGE_STRING__" "User Manual"
 
 .SH NAME
 mensarc \- Configuration file for mensa(1)

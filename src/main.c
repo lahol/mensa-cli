@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Mensa-CLI is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -28,7 +28,7 @@
  *  activated via show.schema=\e name. This can be done in the file ~/.mensarc
  *  Mensa-CLI also provides a shared library `libmensa' which is responsible
  *  for all parsing.
- * 
+ *
  *  @version 0.1
  *  @date 2011-05-01
  *  First usable version.
@@ -47,7 +47,6 @@
 #include <libintl.h>
 
 #include "utils.h"
-
 #include "commands.h"
 #include "defaults.h"
 #include "cmd.h"
@@ -58,43 +57,44 @@
  *  @param[in] argv The command line arguments.
  *  @return 0 on success, 1 otherwise.
  */
-int main(int argc, char **argv) {
-  char *rcpath = NULL;
-  setlocale(LC_ALL, "");
-  
-  defaults_add("cmd.default", "show");
-  defaults_add("show.date", "today");
-  defaults_add("show.description", "yes");
-  defaults_add("show.schema", "");
-  defaults_add("show.clear-cache", "no");
-  defaults_add("show.header", "Offers for %A, %x");
-  defaults_add("show.max-width", "80");
-  
-  rcpath = utils_get_rcpath();
-  
-  if (utils_file_exists(rcpath)) {
-    if (defaults_read(rcpath) != 0) {
-      defaults_free();
-      if (rcpath) {
-        free(rcpath);
-      }
-      return 1;
+int main(int argc, char **argv)
+{
+    char *rcpath = NULL;
+    setlocale(LC_ALL, "");
+
+    defaults_add("cmd.default", "show");
+    defaults_add("show.date", "today");
+    defaults_add("show.description", "yes");
+    defaults_add("show.schema", "");
+    defaults_add("show.clear-cache", "no");
+    defaults_add("show.header", "Offers for %A, %x");
+    defaults_add("show.max-width", "0");
+
+    rcpath = utils_get_rcpath();
+
+    if (utils_file_exists(rcpath)) {
+        if (defaults_read(rcpath) != 0) {
+            defaults_free();
+            if (rcpath) {
+                free(rcpath);
+            }
+            return 1;
+        }
     }
-  }
 
-  command_add("help", cmd_help, NULL);
-  command_add("info", cmd_info, NULL);
-  command_add("show", cmd_show, NULL);
-  command_add("config", cmd_config, NULL);
-  
-  command_call(argc, argv);
-  
-  if (rcpath) {
-    free(rcpath);
-  }
+    command_add("help", cmd_help, NULL);
+    command_add("info", cmd_info, NULL);
+    command_add("show", cmd_show, NULL);
+    command_add("config", cmd_config, NULL);
 
-  defaults_free();
-  
-  return 0;
+    command_call(argc, argv);
+
+    if (rcpath) {
+        free(rcpath);
+    }
+
+    defaults_free();
+
+    return 0;
 }
 

@@ -30,7 +30,7 @@
   identifier="Pizza">Pizza</fooddescription>
   <fooddescription identifier="Bioessen">Bioessen</fooddescription>
   <fooddescription identifier="Kochtöpfe der Welt">Kochtöpfe der Welt</fooddescription>
-  <fooddescription identifier="mensaVital">MensaVital</fooddescription>
+  <fooddescription identifier="MensaVital">MensaVital</fooddescription>
   <food source="1"
   path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
   and position()=1]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />

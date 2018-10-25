@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Mensa-CLI is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -42,39 +42,40 @@ static char term_buffer[2048];
  *  @param[in] str Pointer to the string or NULL.
  *  @param[in] len Length of the string.
  */
-void mensa_output_fixed_len_str(FILE *stream, char *str, int len) {
-  int k = 0, l = 0;
-  FILE *s = stream ? stream : stdout;
-  if (!str) {
-    for (k = 0; k < len; k++) {
-      fputc(' ', s);
+void mensa_output_fixed_len_str(FILE *stream, char *str, int len)
+{
+    int k = 0, l = 0;
+    FILE *s = stream ? stream : stdout;
+    if (!str) {
+        for (k = 0; k < len; k++) {
+            fputc(' ', s);
+        }
+        return;
     }
-    return;
-  }
-  while (str[k] != '\0') {
-    if ((str[k] & 0x80) == 0) {
-      fputc(str[k++], s);
+    while (str[k] != '\0') {
+        if ((str[k] & 0x80) == 0) {
+            fputc(str[k++], s);
+        }
+        else if ((str[k] & 0xe0) == 0xc0) {
+            fputc(str[k++], s);
+            fputc(str[k++], s);
+        }
+        else if ((str[k] & 0xf0) == 0xe0) {
+            fputc(str[k++], s);
+            fputc(str[k++], s);
+            fputc(str[k++], s);
+        }
+        else if ((str[k] & 0xf8) == 0xf0) {
+            fputc(str[k++], s);
+            fputc(str[k++], s);
+            fputc(str[k++], s);
+            fputc(str[k++], s);
+        }
+        l++;
     }
-    else if ((str[k] & 0xe0) == 0xc0) {
-      fputc(str[k++], s);
-      fputc(str[k++], s);
+    for (; l < len; l++) {
+        fputc(' ', stream);
     }
-    else if ((str[k] & 0xf0) == 0xe0) {
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-    }
-    else if ((str[k] & 0xf8) == 0xf0) {
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-      fputc(str[k++], s);
-    }
-    l++;
-  }
-  for (; l < len; l++) {
-    fputc(' ', stream);
-  }
 }
 
 int _mensa_output_block_line(FILE *stream, char *str, int length);
@@ -86,34 +87,37 @@ int _mensa_output_block_line(FILE *stream, char *str, int length);
  *  @param[in] str The string for output.
  *  @param[in] length Maximal length of a line.
  *  @param[in] indent Number of characters to indent the block.
- *  @param[in] indent_first_line 1 if the first line should also
- *                    be indented or 0 if not.
+ *  @param[in] indent_first_line >0 if the first line should be indented,
+ *                               <0 shorten first line (e.g. if label is
+ *                               longer than indent)
  */
 void mensa_output_block(FILE *stream, char *str, int length,
-                        int indent, int indent_first_line) {
-  int offset = 0;
-  int delta = 0;  
-  int len = 0;
-  FILE *s = stream ? stream : stdout;
-  int k;
-  
-  if (!str) {  /* no string given, just print newline */
-    fputc('\n', s);
-    return;
-  }
-  len = strlen(str);
-  while (offset < len) {
-    if (offset > 0 || (offset == 0 && indent_first_line)) {
-      for (k = 0; k < indent; k++) {
-        fputc(' ', s);
-      }
+                        int indent, int indent_first_line)
+{
+    int offset = 0;
+    int delta = 0;
+    int len = 0;
+    FILE *s = stream ? stream : stdout;
+    int k;
+
+    if (!str) {  /* no string given, just print newline */
+        fputc('\n', s);
+        return;
     }
-    delta = _mensa_output_block_line(s, &str[offset], length);
-    if (delta == 0) {
-      break;
+    len = strlen(str);
+    while (offset < len) {
+        if (offset > 0 || (offset == 0 && indent_first_line > 0)) {
+            for (k = 0; k < indent; k++) {
+                fputc(' ', s);
+            }
+        }
+        delta = _mensa_output_block_line(s, &str[offset],
+                                         length + (offset == 0 && indent_first_line < 0 ? indent_first_line : 0));
+        if (delta == 0) {
+            break;
+        }
+        offset += delta;
     }
-    offset += delta;
-  }
 }
 
 /** Writes as much of a line as possible to a file.
@@ -121,83 +125,88 @@ void mensa_output_block(FILE *stream, char *str, int length,
  *                    stdout is used.
  *  @param[in] str The string buffer from which the line is read.
  *  @param[in] length The maximal number of characters to print.
- *  @return offset of the next line 
+ *  @return offset of the next line
  *  @internal
  */
-int _mensa_output_block_line(FILE *stream, char *str, int length) {
-  int len;
-  int i,d;
-  int last_space;
-  int offset = 0;
-  FILE *s = stream ? stream : stdout;
-  
-  /* skip leading spaces but be aware of the complete offset; needs work */
-  while (str[offset] == ' ') { offset++; }
-  if (offset) str = &str[offset];
+int _mensa_output_block_line(FILE *stream, char *str, int length)
+{
+    int len;
+    int i,d;
+    int last_space;
+    int offset = 0;
+    FILE *s = stream ? stream : stdout;
 
-  len = strlen(str);
-  if (len <= length) { /* nothing to cut of, write to output */
-    for (i = 0; str[i] != '\0' && str[i] != '\n'; i++) {
-      fputc(str[i], s);
+    /* skip leading spaces but be aware of the complete offset; needs work */
+    while (str[offset] == ' ') {
+        offset++;
+    }
+    if (offset) str = &str[offset];
+
+    len = strlen(str);
+    if (len <= length) { /* nothing to cut of, write to output */
+        for (i = 0; str[i] != '\0' && str[i] != '\n'; i++) {
+            fputc(str[i], s);
+        }
+        fputc('\n', s);
+        return i+offset;
+    }
+
+    i = 0;
+    d = 0;
+    last_space = 0;
+    /* could be done simpler, but we want to take care of utf-8 characters */
+    while (i < length && str[i+d] != '\0') {
+        if (str[i+d] == ' ' || str[i+d] == ',' || str[i+d] == '-' ||
+                str[i+d] == ';' ||
+                (str[i+d] == '.' && (str[i+d+1] != ',' && str[i+d+1] != ';'
+                                     && str[i+d+1] != '-'))
+                || str[i+d] == ':') {
+            last_space = i+d;
+        }
+        else if (str[i+d] == '\n') {
+            last_space = i+d;
+            break;
+        }
+        else if ((str[i+d] & 0xe0) == 0xc0) {
+            d++;
+        }
+        else if ((str[i+d] & 0xf0) == 0xe0) {
+            d += 2;
+        }
+        else if ((str[i+d] & 0xf8) == 0xf0) {
+            d+= 3;
+        }
+        i++;
+    }
+    if (last_space == 0) { /* no spaces up to length, cut of */
+        last_space = i+d-1; /* -1 ? */
+    }
+
+    for (i = 0; i <= last_space; i++) {
+        fputc(str[i], s);
     }
     fputc('\n', s);
-    return i+offset;
-  }
-  
-  i = 0; d = 0;
-  last_space = 0;
-  /* could be done simpler, but we want to take care of utf-8 characters */
-  while (i < length && str[i+d] != '\0') {
-    if (str[i+d] == ' ' || str[i+d] == ',' || str[i+d] == '-' ||
-        str[i+d] == ';' || 
-         (str[i+d] == '.' && (str[i+d+1] != ',' && str[i+d+1] != ';'
-          && str[i+d+1] != '-'))
-        || str[i+d] == ':') {
-      last_space = i+d;
-    }
-    else if (str[i+d] == '\n') {
-      last_space = i+d;
-      break;
-    }
-    else if ((str[i+d] & 0xe0) == 0xc0) {
-      d++;
-    }
-    else if ((str[i+d] & 0xf0) == 0xe0) {
-      d += 2;
-    }
-    else if ((str[i+d] & 0xf8) == 0xf0) {
-      d+= 3;
-    }
-    i++;
-  }
-  if (last_space == 0) { /* no spaces up to length, cut of */
-    last_space = i+d-1; /* -1 ? */
-  }
-
-  for (i = 0; i <= last_space; i++) {
-    fputc(str[i], s);
-  }
-  fputc('\n', s);
-  return last_space+1+offset;
+    return last_space+1+offset;
 }
 
 /** Get the terminal width
  *  @return The width of the terminal or -1 if determination of
  *          width is not possible.
  */
-int mensa_output_get_term_width(void) {
+int mensa_output_get_term_width(void)
+{
 #if HAVE_TERM_H && HAVE_LIBTERMCAP
-  char *termtype = getenv("TERM");
-  if (termtype == NULL) {
-    return -1;
-  }
-  
-  if (tgetent(term_buffer, termtype) <= 0) {
-    return -1;
-  }
-  
-  return tgetnum("co");
+    char *termtype = getenv("TERM");
+    if (termtype == NULL) {
+        return -1;
+    }
+
+    if (tgetent(term_buffer, termtype) <= 0) {
+        return -1;
+    }
+
+    return tgetnum("co");
 #else
-  return -1;
+    return -1;
 #endif
 }

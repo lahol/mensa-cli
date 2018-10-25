@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Libmensa is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Libmensa.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** @file 
+/** @file
  *  @ingroup libmensa
  *  Mensa specific date handling.
  */
@@ -26,11 +26,11 @@
 /** @brief Necessary information of a date. */
 /* @{ */
 typedef struct _mensaDate {
-  int day;               /**< @brief Day of month (1-31) */
-  int month;             /**< @brief Month of year (1-12) */
-  int year;              /**< @brief Year (like %Y) */
-  int dow;               /**< @brief Day of week (0-6, 0 being sunday) */
-  int week;              /**< @brief Week number relative to current week, 0 being current week. */ 
+    int day;               /**< @brief Day of month (1-31) */
+    int month;             /**< @brief Month of year (1-12) */
+    int year;              /**< @brief Year (like %Y) */
+    int dow;               /**< @brief Day of week (0-6, 0 being sunday) */
+    int week;              /**< @brief Week number relative to current week, 0 being current week. */
 } mensaDate;
 /* @} */
 

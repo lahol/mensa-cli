@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  Mensa-CLI is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,16 +25,16 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-int utils_file_exists(const unsigned char *filename);
-char * utils_get_rcpath(void);
+int utils_file_exists(const char *filename);
+char *utils_get_rcpath(void);
 
 /** @brief Single linked list.
  */
 /* @{ */
 typedef struct _UtilsList UtilsList;
 struct _UtilsList {
-  void *data;          /**< @brief Pointer to the data stored in the list. */
-  UtilsList *next;     /**< @brief Pointer to the next list element. */
+    void *data;          /**< @brief Pointer to the data stored in the list. */
+    UtilsList *next;     /**< @brief Pointer to the next list element. */
 };
 /* @} */
 
