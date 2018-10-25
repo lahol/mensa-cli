@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<mensaschema>
+  <name>tu-chemnitz.de-fnor-strana</name>
+  <description>TU Chemnitz, Mensa Straße der Nationen (fnor)</description>
+  <source id="1" format="xml"
+  flags="1"
+  file="https://www.swcz.de/bilderspeiseplan/xml.php?plan=773823070&amp;jahr=%Y&amp;monat=%m&amp;tag=%d" />
+  <fooddescription identifier="Essen 1">Essen 1</fooddescription>
+  <fooddescription identifier="Essen 2">Essen 2</fooddescription>
+  <fooddescription identifier="Essen 3">Essen 3</fooddescription>
+  <fooddescription identifier="Essen 4">Essen 4</fooddescription>
+  <fooddescription identifier="Abendessen 1">Abendessen 1</fooddescription>
+  <fooddescription identifier="Abendessen 2">Abendessen 2</fooddescription>
+  <fooddescription identifier="Abendessen 3">Abendessen 3</fooddescription>
+  <fooddescription identifier="Abendessen 4">Abendessen 4</fooddescription>
+  <fooddescription identifier="Gemüsebar">Gemüsebar</fooddescription>
+  <fooddescription identifier="Pastatheke">Pastatheke</fooddescription>
+  <fooddescription
+  identifier="Vegetarieressen 1">Vegetarieressen</fooddescription>
+  <fooddescription
+  identifier="Vegetarieressen 2">Vegetarieressen</fooddescription>
+  <fooddescription
+  identifier="Vegetarieressen 3">Vegetarieressen</fooddescription>
+  <fooddescription
+  identifier="Vegetarieressen 4">Vegetarieressen</fooddescription>
+  <fooddescription
+  identifier="Pizza">Pizza</fooddescription>
+  <fooddescription identifier="Bioessen">Bioessen</fooddescription>
+  <fooddescription identifier="Kochtöpfe der Welt">Kochtöpfe der Welt</fooddescription>
+  <fooddescription identifier="MensaVital">MensaVital</fooddescription>
+  <food source="1"
+  path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
+  and position()=1]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
+  <food source="1"
+  path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
+  and position()=2]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
+  <food source="1"
+  path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
+  and position()=3]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
+  <food source="1"
+  path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
+  and position()=4]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
+  <food source="1"
+  path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
+  and position()=5]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
+  <food source="1"
+  path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
+  and position()=6]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
+  <food source="1"
+  path="/*[local-name()=&quot;speiseplan&quot;]/*[local-name()=&quot;essen&quot;
+  and position()=7]/*[local-name()=&quot;deutsch&quot;]" description="../@kategorie" />
+</mensaschema>
