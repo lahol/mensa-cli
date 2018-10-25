@@ -25,6 +25,7 @@ AC_CHECK_LIB([c], [memcpy])
 AC_CHECK_LIB([termcap], [tgetent])
 
 PKG_CHECK_MODULES(XML2, [libxml-2.0 >= 2.0.0])
+PKG_CHECK_MODULES(CURL, [libcurl])
 
 LIBS="$LIBS $XML2_LIBS"
 CFLAGS="$CFLAGS $XML2_CFLAGS"

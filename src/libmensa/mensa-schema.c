@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "mensa-document.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -578,18 +579,30 @@ struct _SchemaSourceDoc * _mensa_schema_read_source(struct _mensaSchemaSource *s
 
   doc = malloc(sizeof(struct _SchemaSourceDoc));
   assert(doc);
+
+  mensaDocument *srcdoc = mensa_document_get(path_buf);
+  if (!srcdoc) {
+      free(doc);
+      return NULL;
+  }
+
   if (source->format == MENSA_SOURCE_FORMAT_HTML) {
-    doc->doc = htmlReadFile(path_buf, NULL, 
-      HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
+/*    doc->doc = htmlReadFile(path_buf, NULL, 
+      HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);*/
+      doc->doc = htmlReadMemory(srcdoc->data, srcdoc->size, path_buf, NULL,
+              HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
   }
   else if (source->format == MENSA_SOURCE_FORMAT_XML) {
-    doc->doc = xmlReadFile(path_buf, NULL, 0);
+  /*  doc->doc = xmlReadFile(path_buf, NULL, 0);*/
+      doc->doc = xmlReadMemory(srcdoc->data, srcdoc->size, path_buf, NULL, 0);
   }
   else {
     fprintf(stderr, "Unknown document format.\n");
+    mensa_document_free(srcdoc);
     free(doc);
     return NULL;
   }
+  mensa_document_free(srcdoc);
   
   if (!doc->doc) {
     fprintf(stderr, "Error parsing document.\n");
